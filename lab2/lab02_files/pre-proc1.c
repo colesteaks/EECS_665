@@ -19,8 +19,8 @@ int main()
   a.in_var2 = 2;
 
   result = a.in_var1 * a.in_var2;
-  
+
   printf("var1=%d * var2=%d = %d\n", a.in_var1, a.in_var2, result);
-  
+
   return 0;
 }
