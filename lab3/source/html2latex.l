@@ -107,7 +107,7 @@ int list_type;
      * beginning and ending tags are stripped off before the LateX statement
      * is emitted.
      *************************************************************************/
-     printf( "\begin{verbatim}")
+     printf( "\\begin{verbatim}");
      printf( "\n" );
     BEGIN PRE;
 }
@@ -134,7 +134,7 @@ int list_type;
      * a new line and resume normal parsing.
      *************************************************************************/
     printf( "\n" );
-    printf( "\end{verbatim}")
+    printf( "\\end{verbatim}");
     printf( "\n" );
     BEGIN 0;
 }
@@ -193,7 +193,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML small, add LaTex scriptsize.
    *************************************************************************/
-   printf( "{\scriptsize");
+   printf( "{\\scriptsize");
 }
 
 <PARA>"</small>" {
@@ -207,7 +207,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML big, add LaTex large.
    *************************************************************************/
-   printf( "{\Large" );
+   printf( "{\\Large" );
 }
 
 <PARA>"</big>" {
@@ -221,7 +221,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML bold, add LaTex textbf.
    *************************************************************************/
-   printf( "\textbf{" );
+   printf( "\\textbf{" );
 }
 
 <PARA>"</b>" {
@@ -235,7 +235,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML i, add LaTex textit.
    *************************************************************************/
-   printf("\textit{");
+   printf("\\textit{");
 }
 
 <PARA>"</i>" {
@@ -249,7 +249,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML strong, add LaTex textmd.
    *************************************************************************/
-   printf("\textmd{");
+   printf("\\textmd{");
 }
 
 <PARA>"</strong>" {
@@ -263,7 +263,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML em, add LaTex emph.
    *************************************************************************/
-   printf("\emph{");
+   printf("\\emph{");
 }
 
 <PARA>"</em>" {
@@ -277,7 +277,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML superscript, add LaTex textsuperscript.
    *************************************************************************/
-   printf("\textsuperscript{");
+   printf("\\textsuperscript{");
 }
 
 <PARA>"</sup>" {
@@ -291,7 +291,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML sub, add LaTex textsubscript.
    *************************************************************************/
-   printf("\textsubscript{")
+   printf("\\textsubscript{");
 }
 
 <PARA>"</sub>" {
@@ -301,13 +301,59 @@ int list_type;
    printf( "}" );
 }
 
+"<ol>" {
+  /**************************************************************************
+   * Matched HTML ol, begin LaTex enumerate.
+   *************************************************************************/
+   printf("\n");
+   printf("\\begin{enumerate}");
+   BEGIN OL;
+}
+
+<OL>"</ol>" {
+  /**************************************************************************
+   * Matched end HTML ol, end LaTex enumerate.
+   *************************************************************************/
+   printf("\n");
+   printf("\\end{enumerate}");
+   printf("\n");
+}
+
+<OL>"<li>" {
+  /**************************************************************************
+   * Matched an HTML p so print it out as a latex paragraph. The
+   * beginning and ending tags are stripped off before the LateX statement
+   * is emitted.
+   *************************************************************************/
+   printf( "\\item");
+   BEGIN LI;
+}
+
+"<ul>" {
+  /**************************************************************************
+   * Matched HTML ul, begin LaTex itemize.
+   *************************************************************************/
+   printf("\n");
+   printf("\\begin{itemize}");
+   BEGIN UL;
+}
+
+<UL>"</ul>" {
+  /**************************************************************************
+   * Matched end HTML ul, end LaTex itemize.
+   *************************************************************************/
+   printf("\n");
+   printf("\\end{itemize}");
+   printf("\n");
+}
+
 "<li>" {
   /**************************************************************************
    * Matched an HTML p so print it out as a latex paragraph. The
    * beginning and ending tags are stripped off before the LateX statement
    * is emitted.
    *************************************************************************/
-   printf( "\item");
+   printf( "\\item");
    BEGIN LI;
 }
 
@@ -331,7 +377,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML small, add LaTex scriptsize.
    *************************************************************************/
-   printf( "{\scriptsize");
+   printf( "{\\scriptsize");
 }
 
 <LI>"</small>" {
@@ -345,7 +391,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML big, add LaTex large.
    *************************************************************************/
-   printf( "{\Large" );
+   printf( "{\\Large" );
 }
 
 <LI>"</big>" {
@@ -359,7 +405,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML bold, add LaTex textbf.
    *************************************************************************/
-   printf( "\textbf{" );
+   printf( "\\textbf{" );
 }
 
 <LI>"</b>" {
@@ -373,7 +419,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML i, add LaTex textit.
    *************************************************************************/
-   printf("\textit{");
+   printf("\\textit{");
 }
 
 <LI>"</i>" {
@@ -387,7 +433,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML strong, add LaTex textmd.
    *************************************************************************/
-   printf("\textmd{");
+   printf("\\textmd{");
 }
 
 <LI>"</strong>" {
@@ -401,7 +447,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML em, add LaTex emph.
    *************************************************************************/
-   printf("\emph{");
+   printf("\\emph{");
 }
 
 <LI>"</em>" {
@@ -415,7 +461,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML superscript, add LaTex textsuperscript.
    *************************************************************************/
-   printf("\textsuperscript{");
+   printf("\\textsuperscript{");
 }
 
 <LI>"</sup>" {
@@ -429,7 +475,7 @@ int list_type;
   /**************************************************************************
    * Matched HTML sub, add LaTex textsubscript.
    *************************************************************************/
-   printf("\textsubscript{")
+   printf("\\textsubscript{");
 }
 
 <LI>"</sub>" {
