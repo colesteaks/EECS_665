@@ -49,22 +49,21 @@ Disassembly of section .comment:
    6:	28 47 4e             	sub    %al,0x4e(%rdi)
    9:	55                   	push   %rbp
    a:	29 20                	sub    %esp,(%rax)
-   c:	34 2e                	xor    $0x2e,%al
-   e:	38 2e                	cmp    %ch,(%rsi)
-  10:	33 20                	xor    (%rax),%esp
+   c:	36 2e 31 2e          	ss xor %ebp,%cs:(%rsi)
+  10:	31 20                	xor    %esp,(%rax)
   12:	32 30                	xor    (%rax),%dh
-  14:	31 34 30             	xor    %esi,(%rax,%rsi,1)
-  17:	39 31                	cmp    %esi,(%rcx)
-  19:	31 20                	xor    %esp,(%rax)
-  1b:	28 52 65             	sub    %dl,0x65(%rdx)
-  1e:	64 20 48 61          	and    %cl,%fs:0x61(%rax)
+  14:	31 36                	xor    %esi,(%rsi)
+  16:	30 36                	xor    %dh,(%rsi)
+  18:	32 31                	xor    (%rcx),%dh
+  1a:	20 28                	and    %ch,(%rax)
+  1c:	52                   	push   %rdx
+  1d:	65 64 20 48 61       	gs and %cl,%fs:0x61(%rax)
   22:	74 20                	je     44 <main+0x44>
-  24:	34 2e                	xor    $0x2e,%al
-  26:	38 2e                	cmp    %ch,(%rsi)
-  28:	33                   	.byte 0x33
+  24:	36 2e 31 2e          	ss xor %ebp,%cs:(%rsi)
+  28:	31                   	.byte 0x31
   29:	2d                   	.byte 0x2d
-  2a:	37                   	(bad)  
-  2b:	29 00                	sub    %eax,(%rax)
+  2a:	33 29                	xor    (%rcx),%ebp
+	...
 
 Disassembly of section .eh_frame:
 

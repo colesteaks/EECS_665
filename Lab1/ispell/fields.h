@@ -21,42 +21,38 @@
  */
 
 typedef struct
-    {
-    int		nfields;	/* Number of fields in the line */
-    int		hadnl;		/* NZ if line ended with a newline */
-    char *	linebuf;	/* Malloc'ed buffer containing the line */
-    char **	fields;		/* Malloc'ed array of pointers to fields */
-    }
-		field_t;
+{
+    int nfields; /* Number of fields in the line */
+    int hadnl; /* NZ if line ended with a newline */
+    char *linebuf; /* Malloc'ed buffer containing the line */
+    char **fields; /* Malloc'ed array of pointers to fields */
+} field_t;
 
 /*
  * Flags to fieldread and fieldmake
  */
-#define FLD_RUNS	0x0001	/* Consider runs of delimiters same as one */
-#define FLD_SNGLQUOTES	0x0002	/* Accept single-quoted fields */
-#define FLD_BACKQUOTES	0x0004	/* Accept back-quoted fields */
-#define FLD_DBLQUOTES	0x0008	/* Accept double-quoted fields */
-#define FLD_SHQUOTES	0x0010	/* Use shell-style (embedded) quoting rules */
-#define FLD_STRIPQUOTES	0x0020	/* Strip quotes from fields */
-#define FLD_BACKSLASH	0x0040	/* Process C-style backslashes */
-#define FLD_NOSHRINK	0x0080	/* Don't shrink memory before return */
+#define FLD_RUNS 0x0001 /* Consider runs of delimiters same as one */
+#define FLD_SNGLQUOTES 0x0002 /* Accept single-quoted fields */
+#define FLD_BACKQUOTES 0x0004 /* Accept back-quoted fields */
+#define FLD_DBLQUOTES 0x0008 /* Accept double-quoted fields */
+#define FLD_SHQUOTES 0x0010 /* Use shell-style (embedded) quoting rules */
+#define FLD_STRIPQUOTES 0x0020 /* Strip quotes from fields */
+#define FLD_BACKSLASH 0x0040 /* Process C-style backslashes */
+#define FLD_NOSHRINK 0x0080 /* Don't shrink memory before return */
 
 #undef P
 #ifdef __STDC__
-#define P(x)	x
+#define P(x) x
 #else /* __STDC__ */
-#define P(x)	()
+#define P(x) ()
 #endif /* __STDC__ */
 
-extern field_t *	fieldread P ((FILE * file, char * delims,
-			  int flags, int maxf));
-extern field_t *	fieldmake P ((char * line, int allocated,
-			  char * delims, int flags, int maxf));
-extern int		fieldwrite P ((FILE * file, field_t * fieldp,
-			  int delim));
-extern void		fieldfree P ((field_t * fieldp));
+extern field_t *fieldread P((FILE * file, char *delims, int flags, int maxf));
+extern field_t *fieldmake P((char *line, int allocated, char *delims, int flags, int maxf));
+extern int fieldwrite P((FILE * file, field_t *fieldp, int delim));
+extern void fieldfree P((field_t * fieldp));
 
-extern unsigned int	field_field_inc;
-				/* Increment for expanding fields */
-extern unsigned int	field_line_inc;
-				/* Increment for expanding lines */
+extern unsigned int field_field_inc;
+/* Increment for expanding fields */
+extern unsigned int field_line_inc;
+/* Increment for expanding lines */

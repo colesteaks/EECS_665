@@ -1,6 +1,5 @@
 #ifndef lint
-static char Rcs_Id[] =
-    "$Id: sq.c,v 1.12 1994/01/25 07:12:09 geoff Exp $";
+static char Rcs_Id[] = "$Id: sq.c,v 1.12 1994/01/25 07:12:09 geoff Exp $";
 #endif
 
 /*
@@ -51,59 +50,55 @@ static char Rcs_Id[] =
 #include <stdio.h>
 
 #ifdef __STDC__
-#define P(x)	x
+#define P(x) x
 #else /* __STDC__ */
-#define P(x)	()
+#define P(x) ()
 #endif /* __STDC__ */
 
-int		main P ((int argc, char * argv[]));
-static void	trunc P ((char * word, char * prev));
+int main P((int argc, char *argv[]));
+static void trunc P((char *word, char *prev));
 
 /*
  * The following table encodes prefix sizes as a single character.  A
  * matching table will be found in unsq.c.
  */
-static char size_encodings[] =
-    {
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',	/* 00-09 */
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',	/* 10-19 */
-    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',	/* 20-29 */
-    'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',	/* 30-39 */
-    'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',	/* 40-49 */
-    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',	/* 50-59 */
-    'y', 'z'						/* 60-61 */
-    };
+static char size_encodings[] = {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', /* 00-09 */
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', /* 10-19 */
+    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', /* 20-29 */
+    'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', /* 30-39 */
+    'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', /* 40-49 */
+    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', /* 50-59 */
+    'y', 'z' /* 60-61 */
+};
 
-#define MAX_PREFIX	(sizeof (size_encodings) - 1)
+#define MAX_PREFIX (sizeof(size_encodings) - 1)
 
-int main (argc, argv)
-    int		argc;
-    char *	argv[];
-    {
-    char	word[257];
-    static char	prev[257] = "";
+int main(argc, argv) int argc;
+char *argv[];
+{
+    char word[257];
+    static char prev[257] = "";
 
-    while (gets (word) != NULL)
-	trunc (word, prev);
+    while(gets(word) != NULL)
+        trunc(word, prev);
     return 0;
-    }
+}
 
-static void trunc (word, prev) 
-    char *		word;
-    char *		prev;
-    {
-    register char *	wordp;
-    register char *	prevp;
-    register int	same_count;
+static void trunc(word, prev) char *word;
+char *prev;
+{
+    register char *wordp;
+    register char *prevp;
+    register int same_count;
 
     wordp = word;
     prevp = prev;
-    for (same_count = 0;  *wordp == *prevp++;  ++wordp, ++same_count)
-	;
-    if (same_count>MAX_PREFIX)
-	same_count = MAX_PREFIX;
-    (void) putchar (size_encodings[same_count]);
-    (void) puts (wordp);
-    (void) strcpy (prev, word);
-    }
-
+    for(same_count = 0; *wordp == *prevp++; ++wordp, ++same_count)
+        ;
+    if(same_count > MAX_PREFIX)
+        same_count = MAX_PREFIX;
+    (void)putchar(size_encodings[same_count]);
+    (void)puts(wordp);
+    (void)strcpy(prev, word);
+}

@@ -1,6 +1,5 @@
 #ifndef lint
-static char Rcs_Id[] =
-    "$Id: defmt.c,v 1.41 1995/08/05 23:19:47 geoff Exp $";
+static char Rcs_Id[] = "$Id: defmt.c,v 1.41 1995/08/05 23:19:47 geoff Exp $";
 #endif
 
 /*
@@ -127,29 +126,27 @@ static char Rcs_Id[] =
 #include "proto.h"
 #include "msgs.h"
 
-static char *	skiptoword P ((char * bufp));
-char *		skipoverword P ((char * bufp));
-void		checkline P ((FILE * ofile));
-static int	TeX_math_end P ((char ** bufp));
-static int	TeX_math_begin P ((char ** bufp));
-static int	TeX_LR_begin P ((char ** bufp));
-static int	TeX_LR_check P ((int begin_p, char ** bufp));
-static void	TeX_skip_args P ((char ** bufp));
-static int	TeX_math_check P ((int cont_char, char ** bufp));
-static void	TeX_skip_parens P ((char ** bufp));
-static void	TeX_open_paren P ((char ** bufp));
-static void	TeX_skip_check P ((char ** bufp));
-static int	TeX_strncmp P ((char * a, char * b, int n));
+static char *skiptoword P((char *bufp));
+char *skipoverword P((char *bufp));
+void checkline P((FILE * ofile));
+static int TeX_math_end P((char **bufp));
+static int TeX_math_begin P((char **bufp));
+static int TeX_LR_begin P((char **bufp));
+static int TeX_LR_check P((int begin_p, char **bufp));
+static void TeX_skip_args P((char **bufp));
+static int TeX_math_check P((int cont_char, char **bufp));
+static void TeX_skip_parens P((char **bufp));
+static void TeX_open_paren P((char **bufp));
+static void TeX_skip_check P((char **bufp));
+static int TeX_strncmp P((char *a, char *b, int n));
 
-#define ISTEXTERM(c)   (((c) == TEXLEFTCURLY) || \
-			((c) == TEXRIGHTCURLY) || \
-			((c) == TEXLEFTSQUARE) || \
-			((c) == TEXRIGHTSQUARE))
-#define ISMATHCH(c)    (((c) == TEXBACKSLASH) || \
-			((c) == TEXDOLLAR) || \
-			((c) == TEXPERCENT))
+#define ISTEXTERM(c)                                    \
+    (((c) == TEXLEFTCURLY) || ((c) == TEXRIGHTCURLY) || \
+     ((c) == TEXLEFTSQUARE) || ((c) == TEXRIGHTSQUARE))
+#define ISMATHCH(c) \
+    (((c) == TEXBACKSLASH) || ((c) == TEXDOLLAR) || ((c) == TEXPERCENT))
 
-static int	    TeX_comment = 0;
+static int TeX_comment = 0;
 
 /*
  * The following variables are used to save the parsing state when
@@ -160,717 +157,674 @@ static int	    TeX_comment = 0;
 static int save_math_mode;
 static char save_LaTeX_Mode;
 
-static char * skiptoword (bufp)		/* Skip to beginning of a word */
-    char *	bufp;
-    {
+static char *skiptoword(bufp) /* Skip to beginning of a word */
+char *bufp;
+{
 
-    while (*bufp
-      &&  ((!isstringch (bufp, 0)  &&  !iswordch (chartoichar (*bufp)))
-	||  isboundarych (chartoichar (*bufp))
-	||  (tflag  &&  (math_mode & 1)))
-      )
-	{
-	/* check paren necessity... */
-	if (tflag) /* TeX or LaTeX stuff */
-	    {
-	    /* Odd numbers mean we are in "math mode" */
-	    /* Even numbers mean we are in LR or */
-	    /* paragraph mode */
-	    if (*bufp == TEXPERCENT)
-		{
-		if (!TeX_comment)
-		    {
-		    save_math_mode = math_mode;
-		    save_LaTeX_Mode = LaTeX_Mode;
-		    math_mode = 0;
-		    LaTeX_Mode = 'P';
-		    TeX_comment = 1;
-		    }
-		}
-	    else if (math_mode & 1)
-		{
-		if ((LaTeX_Mode == 'e'  &&  TeX_math_check('e', &bufp))
-		  || (LaTeX_Mode == 'm'  &&  TeX_LR_check(1, &bufp)))
-		    math_mode--;    /* end math mode */
-		else
-		    {
-		    while (*bufp  && !ISMATHCH(*bufp))
-			bufp++;
-		    if (*bufp == 0)
-			break;
-		    if (TeX_math_end(&bufp))
-			math_mode--;
-		    }
-		if (math_mode < 0)
-		    {
-		    (void) fprintf (stderr,
-		     DEFMT_C_TEX_MATH_ERROR);
-		    math_mode = 0;
-		    }
-		}
-	    else
-		{
-		if (math_mode > 1
-		  &&  *bufp == TEXRIGHTCURLY
-		  &&  (math_mode < (math_mode & 127) * 128))
-		    math_mode--;    /* re-enter math */
-		else if (LaTeX_Mode == 'm'
-		    || (math_mode && (math_mode >= (math_mode & 127) * 128)
-		  &&  (TeX_strncmp(bufp, "\\end", 4)
-		    == 0)))
-		    {
-		    if (TeX_LR_check(0, &bufp))
-			math_mode--;
-		    }
-		else if (LaTeX_Mode == 'b'  &&  TeX_math_check('b', &bufp))
-		    {
-		    /* continued begin */
-		    math_mode++;
-		    }
-		else if (LaTeX_Mode == 'r')
-		    {
-		    /* continued "reference" */
-		    TeX_skip_parens(&bufp);
-		    LaTeX_Mode = 'P';
-		    }
-		else if (TeX_math_begin(&bufp))
-		    /* checks references and */
-		    /* skips \ commands */
-		    math_mode++;
-		}
-	    if (*bufp == 0)
-		break;
-	    }
-	else			/* formatting escape sequences */
-	    {
-	    if (*bufp == NRBACKSLASH)
-		{
-		switch ( bufp[1] )
-		    {
-		    case 'f':
-			if(bufp[2] == NRLEFTPAREN)
-			    {
-			    /* font change: \f(XY */
-			    bufp += 5;
-			    }
-			else
-			    {
-			    /* ) */
-			    /* font change: \fX */
-			    bufp += 3;
-			    }
-			continue;
-		    case 's':
-			/* size change */
-			bufp += 2;
-			if (*bufp == '+'  ||  *bufp == '-')
-			    bufp++;
-			/* This looks wierd 'cause we
-			** assume *bufp is now a digit.
-			*/
-			bufp++;
-			if (isdigit (*bufp))
-			    bufp++;
-			continue;
-		    default:
-			if (bufp[1] == NRLEFTPAREN)
-			    {
-			    /* extended char set */
-			    /* escape:  \(XX */
-			    /* ) */
-			    bufp += 4;
-			    continue;
-			    }
-			else if (bufp[1] == NRSTAR)
-			    {
-			    if (bufp[2] == NRLEFTPAREN)
-				bufp += 5;
-			    else
-				bufp += 3;
-			    continue;
-			    }
-			break;
-		    }
-		}
-	    }
-	/*
-	 * Skip hex numbers, but not if we're in non-terse askmode.
-	 * (In that case, we'd lose sync if we skipped hex.)
-	 */
-	if (*bufp == '0'
-	  &&  (bufp[1] == 'x'  ||  bufp[1] == 'X')
-	  &&  (terse  ||  !aflag))
-	    {
-	    bufp += 2;
-	    while (isxdigit (*bufp))
-		bufp++;
-	    }
-	else
-	    bufp++;
-	}
-    if (*bufp == '\0')
-	{
-	if (TeX_comment)
-	    {
-	    math_mode = save_math_mode;
-	    LaTeX_Mode = save_LaTeX_Mode;
-	    TeX_comment = 0;
-	    }
-	}
-    return bufp;
+    while(*bufp && ((!isstringch(bufp, 0) && !iswordch(chartoichar(*bufp))) ||
+                    isboundarych(chartoichar(*bufp)) || (tflag && (math_mode & 1))))
+    {
+        /* check paren necessity... */
+        if(tflag) /* TeX or LaTeX stuff */
+        {
+            /* Odd numbers mean we are in "math mode" */
+            /* Even numbers mean we are in LR or */
+            /* paragraph mode */
+            if(*bufp == TEXPERCENT)
+            {
+                if(!TeX_comment)
+                {
+                    save_math_mode = math_mode;
+                    save_LaTeX_Mode = LaTeX_Mode;
+                    math_mode = 0;
+                    LaTeX_Mode = 'P';
+                    TeX_comment = 1;
+                }
+            }
+            else if(math_mode & 1)
+            {
+                if((LaTeX_Mode == 'e' && TeX_math_check('e', &bufp)) ||
+                   (LaTeX_Mode == 'm' && TeX_LR_check(1, &bufp)))
+                    math_mode--; /* end math mode */
+                else
+                {
+                    while(*bufp && !ISMATHCH(*bufp))
+                        bufp++;
+                    if(*bufp == 0)
+                        break;
+                    if(TeX_math_end(&bufp))
+                        math_mode--;
+                }
+                if(math_mode < 0)
+                {
+                    (void)fprintf(stderr, DEFMT_C_TEX_MATH_ERROR);
+                    math_mode = 0;
+                }
+            }
+            else
+            {
+                if(math_mode > 1 && *bufp == TEXRIGHTCURLY &&
+                   (math_mode < (math_mode & 127) * 128))
+                    math_mode--; /* re-enter math */
+                else if(LaTeX_Mode == 'm' ||
+                        (math_mode && (math_mode >= (math_mode & 127) * 128) &&
+                         (TeX_strncmp(bufp, "\\end", 4) == 0)))
+                {
+                    if(TeX_LR_check(0, &bufp))
+                        math_mode--;
+                }
+                else if(LaTeX_Mode == 'b' && TeX_math_check('b', &bufp))
+                {
+                    /* continued begin */
+                    math_mode++;
+                }
+                else if(LaTeX_Mode == 'r')
+                {
+                    /* continued "reference" */
+                    TeX_skip_parens(&bufp);
+                    LaTeX_Mode = 'P';
+                }
+                else if(TeX_math_begin(&bufp))
+                    /* checks references and */
+                    /* skips \ commands */
+                    math_mode++;
+            }
+            if(*bufp == 0)
+                break;
+        }
+        else /* formatting escape sequences */
+        {
+            if(*bufp == NRBACKSLASH)
+            {
+                switch(bufp[1])
+                {
+                case 'f':
+                    if(bufp[2] == NRLEFTPAREN)
+                    {
+                        /* font change: \f(XY */
+                        bufp += 5;
+                    }
+                    else
+                    {
+                        /* ) */
+                        /* font change: \fX */
+                        bufp += 3;
+                    }
+                    continue;
+                case 's':
+                    /* size change */
+                    bufp += 2;
+                    if(*bufp == '+' || *bufp == '-')
+                        bufp++;
+                    /* This looks wierd 'cause we
+                    ** assume *bufp is now a digit.
+                    */
+                    bufp++;
+                    if(isdigit(*bufp))
+                        bufp++;
+                    continue;
+                default:
+                    if(bufp[1] == NRLEFTPAREN)
+                    {
+                        /* extended char set */
+                        /* escape:  \(XX */
+                        /* ) */
+                        bufp += 4;
+                        continue;
+                    }
+                    else if(bufp[1] == NRSTAR)
+                    {
+                        if(bufp[2] == NRLEFTPAREN)
+                            bufp += 5;
+                        else
+                            bufp += 3;
+                        continue;
+                    }
+                    break;
+                }
+            }
+        }
+        /*
+         * Skip hex numbers, but not if we're in non-terse askmode.
+         * (In that case, we'd lose sync if we skipped hex.)
+         */
+        if(*bufp == '0' && (bufp[1] == 'x' || bufp[1] == 'X') && (terse || !aflag))
+        {
+            bufp += 2;
+            while(isxdigit(*bufp))
+                bufp++;
+        }
+        else
+            bufp++;
     }
-
-char * skipoverword (bufp)	/* Return pointer to end of a word */
-    register char *	bufp;	/* Start of word -- MUST BE A REAL START */
+    if(*bufp == '\0')
     {
-    register char *	lastboundary;
-    register int	scharlen; /* Length of a string character */
+        if(TeX_comment)
+        {
+            math_mode = save_math_mode;
+            LaTeX_Mode = save_LaTeX_Mode;
+            TeX_comment = 0;
+        }
+    }
+    return bufp;
+}
+
+char *skipoverword(bufp) /* Return pointer to end of a word */
+register char *bufp; /* Start of word -- MUST BE A REAL START */
+{
+    register char *lastboundary;
+    register int scharlen; /* Length of a string character */
 
     lastboundary = NULL;
-    for (  ;  ;  )
-	{
-	if (*bufp == '\0')
-	    {
-	    if (TeX_comment)
-		{
-		math_mode = save_math_mode;
-		LaTeX_Mode = save_LaTeX_Mode;
-		TeX_comment = 0;
-		}
-	    break;
-	    }
-	else if (l_isstringch(bufp, scharlen, 0))
-	    {
-	    bufp += scharlen;
-	    lastboundary = NULL;
-	    }
-	/*
-	** Note that we get here if a character satisfies
-	** isstringstart() but isn't in the string table;  this
-	** allows string characters to start with word characters.
-	*/
-	else if (iswordch (chartoichar (*bufp)))
-	    {
-	    bufp++;
-	    lastboundary = NULL;
-	    }
-	else if (isboundarych (chartoichar (*bufp)))
-	    {
-	    if (lastboundary == NULL)
-		lastboundary = bufp;
-	    else if (lastboundary == bufp - 1)
-		break;			/* Double boundary -- end of word */
-	    bufp++;
-	    }
-	else
-	    break;			/* End of the word */
-	}
+    for(;;)
+    {
+        if(*bufp == '\0')
+        {
+            if(TeX_comment)
+            {
+                math_mode = save_math_mode;
+                LaTeX_Mode = save_LaTeX_Mode;
+                TeX_comment = 0;
+            }
+            break;
+        }
+        else if(l_isstringch(bufp, scharlen, 0))
+        {
+            bufp += scharlen;
+            lastboundary = NULL;
+        }
+        /*
+        ** Note that we get here if a character satisfies
+        ** isstringstart() but isn't in the string table;  this
+        ** allows string characters to start with word characters.
+        */
+        else if(iswordch(chartoichar(*bufp)))
+        {
+            bufp++;
+            lastboundary = NULL;
+        }
+        else if(isboundarych(chartoichar(*bufp)))
+        {
+            if(lastboundary == NULL)
+                lastboundary = bufp;
+            else if(lastboundary == bufp - 1)
+                break; /* Double boundary -- end of word */
+            bufp++;
+        }
+        else
+            break; /* End of the word */
+    }
     /*
-    ** If the word ended in one or more boundary characters, 
+    ** If the word ended in one or more boundary characters,
     ** the address of the first of these is in lastboundary, and it
     ** is the end of the word.  Otherwise, bufp is the end.
     */
     return (lastboundary != NULL) ? lastboundary : bufp;
-    }
+}
 
-void checkline (ofile)
-    FILE *		ofile;
-    {
-    register char *	p;
-    register char *	endp;
-    int			hadlf;
-    register int	len;
-    register int	i;
-    int			ilen;
+void checkline(ofile) FILE *ofile;
+{
+    register char *p;
+    register char *endp;
+    int hadlf;
+    register int len;
+    register int i;
+    int ilen;
 
     currentchar = contextbufs[0];
-    len = strlen (contextbufs[0]) - 1;
+    len = strlen(contextbufs[0]) - 1;
     hadlf = contextbufs[0][len] == '\n';
-    if (hadlf)
-	contextbufs[0][len] = 0;
+    if(hadlf)
+        contextbufs[0][len] = 0;
 
-    if (!tflag)
-	{
-	/* skip over .if */
-	if (*currentchar == NRDOT
-	  &&  (strncmp (currentchar + 1, "if t", 4) == 0
-	    ||  strncmp (currentchar + 1, "if n", 4) == 0))
-	    {
-	    copyout (&currentchar,5);
-	    while (*currentchar
-	      &&  myspace (chartoichar (*currentchar)))
-		copyout (&currentchar, 1);
-	    }
+    if(!tflag)
+    {
+        /* skip over .if */
+        if(*currentchar == NRDOT && (strncmp(currentchar + 1, "if t", 4) == 0 ||
+                                     strncmp(currentchar + 1, "if n", 4) == 0))
+        {
+            copyout(&currentchar, 5);
+            while(*currentchar && myspace(chartoichar(*currentchar)))
+                copyout(&currentchar, 1);
+        }
 
-	/* skip over .ds XX or .nr XX */
-	if (*currentchar == NRDOT
-	  &&  (strncmp (currentchar + 1, "ds ", 3) == 0 
-	    ||  strncmp (currentchar + 1, "de ", 3) == 0
-	    ||  strncmp (currentchar + 1, "nr ", 3) == 0))
-	    {
-	    copyout (&currentchar, 4);
-	    while (*currentchar
-	      &&  myspace (chartoichar (*currentchar)))
-		copyout(&currentchar, 1);
-	    while (*currentchar
-	      &&  !myspace (chartoichar (*currentchar)))
-		copyout(&currentchar, 1);
-	    if (*currentchar == 0)
-		{
-		if (!lflag  &&  (aflag  ||  hadlf))
-		    (void) putc ('\n', ofile);
-		return;
-		}
-	    }
-	}
+        /* skip over .ds XX or .nr XX */
+        if(*currentchar == NRDOT && (strncmp(currentchar + 1, "ds ", 3) == 0 ||
+                                     strncmp(currentchar + 1, "de ", 3) == 0 ||
+                                     strncmp(currentchar + 1, "nr ", 3) == 0))
+        {
+            copyout(&currentchar, 4);
+            while(*currentchar && myspace(chartoichar(*currentchar)))
+                copyout(&currentchar, 1);
+            while(*currentchar && !myspace(chartoichar(*currentchar)))
+                copyout(&currentchar, 1);
+            if(*currentchar == 0)
+            {
+                if(!lflag && (aflag || hadlf))
+                    (void)putc('\n', ofile);
+                return;
+            }
+        }
+    }
 
 
     /* if this is a formatter command, skip over it */
-    if (!tflag && *currentchar == NRDOT)
-	{
-	while (*currentchar  &&  !myspace (chartoichar (*currentchar)))
-	    {
-	    if (!aflag && !lflag)
-		(void) putc (*currentchar, ofile);
-	    currentchar++;
-	    }
-	if (*currentchar == 0)
-	    {
-	    if (!lflag  &&  (aflag  ||  hadlf))
-		(void) putc ('\n', ofile);
-	    return;
-	    }
-	}
+    if(!tflag && *currentchar == NRDOT)
+    {
+        while(*currentchar && !myspace(chartoichar(*currentchar)))
+        {
+            if(!aflag && !lflag)
+                (void)putc(*currentchar, ofile);
+            currentchar++;
+        }
+        if(*currentchar == 0)
+        {
+            if(!lflag && (aflag || hadlf))
+                (void)putc('\n', ofile);
+            return;
+        }
+    }
 
-    for (  ;  ;  )
-	{
-	p = skiptoword (currentchar);
-	if (p != currentchar)
-	    copyout (&currentchar, p - currentchar);
+    for(;;)
+    {
+        p = skiptoword(currentchar);
+        if(p != currentchar)
+            copyout(&currentchar, p - currentchar);
 
-	if (*currentchar == 0)
-	    break;
+        if(*currentchar == 0)
+            break;
 
-	p = ctoken;
-	endp = skipoverword (currentchar);
-	while (currentchar < endp  &&  p < ctoken + sizeof ctoken - 1)
-	    *p++ = *currentchar++;
-	*p = 0;
-	if (strtoichar (itoken, ctoken, INPUTWORDLEN * sizeof (ichar_t), 0))
-	    (void) fprintf (stderr, WORD_TOO_LONG (ctoken));
-	ilen = icharlen (itoken);
+        p = ctoken;
+        endp = skipoverword(currentchar);
+        while(currentchar < endp && p < ctoken + sizeof ctoken - 1)
+            *p++ = *currentchar++;
+        *p = 0;
+        if(strtoichar(itoken, ctoken, INPUTWORDLEN * sizeof(ichar_t), 0))
+            (void)fprintf(stderr, WORD_TOO_LONG(ctoken));
+        ilen = icharlen(itoken);
 
-	if (lflag)
-	    {
-	    if (ilen > minword
-	      &&  !good (itoken, 0, 0, 0, 0)
-	      &&  !cflag  &&  !compoundgood (itoken, 0))
-		(void) fprintf (ofile, "%s\n", ctoken);
-	    }
-	else
-	    {
-	    if (aflag)
-		{
-		if (ilen <= minword)
-		    {
-		    /* matched because of minword */
-		    if (!terse)
-			(void) fprintf (ofile, "*\n");
-		    continue;
-		    }
-		if (good (itoken, 0, 0, 0, 0))
-		    {
-		    if (hits[0].prefix == NULL
-		      &&  hits[0].suffix == NULL)
-			{
-			/* perfect match */
-			if (!terse)
-			    (void) fprintf (ofile, "*\n");
-			}
-		    else if (!terse)
-			{
-			/* matched because of root */
-			(void) fprintf (ofile, "+ %s\n",
-			  hits[0].dictent->word);
-			}
-		    }
-		else if (compoundgood (itoken, 0))
-		    {
-		    /* compound-word match */
-		    if (!terse)
-			(void) fprintf (ofile, "-\n");
-		    }
-		else
-		    {
-		    makepossibilities (itoken);
-		    if (pcount)
-			{
-			/*
-			** print &  or ?, ctoken, then
-			** character offset, possibility
-			** count, and the possibilities.
-			*/
-			(void) fprintf (ofile, "%c %s %d %d",
-			  easypossibilities ? '&' : '?',
-			  ctoken,
-			  easypossibilities,
-			  (int) ((currentchar - contextbufs[0])
-			    - strlen (ctoken)) + contextoffset);
-			for (i = 0;  i < MAXPOSSIBLE;  i++)
-			    {
-			    if (possibilities[i][0] == 0)
-				break;
-			    (void) fprintf (ofile, "%c %s",
-			      i ? ',' : ':', possibilities[i]);
-			    }
-			(void) fprintf (ofile, "\n");
-			}
-		    else
-			{
-			/*
-			** No possibilities found for word TOKEN
-			*/
-			(void) fprintf (ofile, "# %s %d\n",
-			  ctoken,
-			  (int) ((currentchar - contextbufs[0])
-			    - strlen (ctoken)) + contextoffset);
-			}
-		    }
-		}
-	    else
-		{
-		if (!quit)
-		   correct (ctoken, sizeof ctoken, itoken, sizeof itoken,
-		     &currentchar);
-		}
-	    }
-	if (!aflag  &&  !lflag)
-	   (void) fprintf (ofile, "%s", ctoken);
-	}
+        if(lflag)
+        {
+            if(ilen > minword && !good(itoken, 0, 0, 0, 0) && !cflag &&
+               !compoundgood(itoken, 0))
+                (void)fprintf(ofile, "%s\n", ctoken);
+        }
+        else
+        {
+            if(aflag)
+            {
+                if(ilen <= minword)
+                {
+                    /* matched because of minword */
+                    if(!terse)
+                        (void)fprintf(ofile, "*\n");
+                    continue;
+                }
+                if(good(itoken, 0, 0, 0, 0))
+                {
+                    if(hits[0].prefix == NULL && hits[0].suffix == NULL)
+                    {
+                        /* perfect match */
+                        if(!terse)
+                            (void)fprintf(ofile, "*\n");
+                    }
+                    else if(!terse)
+                    {
+                        /* matched because of root */
+                        (void)fprintf(ofile, "+ %s\n", hits[0].dictent->word);
+                    }
+                }
+                else if(compoundgood(itoken, 0))
+                {
+                    /* compound-word match */
+                    if(!terse)
+                        (void)fprintf(ofile, "-\n");
+                }
+                else
+                {
+                    makepossibilities(itoken);
+                    if(pcount)
+                    {
+                        /*
+                        ** print &  or ?, ctoken, then
+                        ** character offset, possibility
+                        ** count, and the possibilities.
+                        */
+                        (void)fprintf(ofile, "%c %s %d %d", easypossibilities ? '&' : '?',
+                                      ctoken, easypossibilities,
+                                      (int)((currentchar - contextbufs[0]) - strlen(ctoken)) +
+                                      contextoffset);
+                        for(i = 0; i < MAXPOSSIBLE; i++)
+                        {
+                            if(possibilities[i][0] == 0)
+                                break;
+                            (void)fprintf(ofile, "%c %s", i ? ',' : ':', possibilities[i]);
+                        }
+                        (void)fprintf(ofile, "\n");
+                    }
+                    else
+                    {
+                        /*
+                        ** No possibilities found for word TOKEN
+                        */
+                        (void)fprintf(ofile, "# %s %d\n", ctoken,
+                                      (int)((currentchar - contextbufs[0]) - strlen(ctoken)) +
+                                      contextoffset);
+                    }
+                }
+            }
+            else
+            {
+                if(!quit)
+                    correct(ctoken, sizeof ctoken, itoken, sizeof itoken, &currentchar);
+            }
+        }
+        if(!aflag && !lflag)
+            (void)fprintf(ofile, "%s", ctoken);
+    }
 
-    if (!lflag  &&  (aflag  ||  hadlf))
-       (void) putc ('\n', ofile);
-   }
+    if(!lflag && (aflag || hadlf))
+        (void)putc('\n', ofile);
+}
 
 /* must check for \begin{mbox} or whatever makes new text region. */
-static int TeX_math_end (bufp)
-    char **	bufp;
-    {
+static int TeX_math_end(bufp) char **bufp;
+{
 
-    if (**bufp == TEXDOLLAR)
-	{
-	if ((*bufp)[1] == TEXDOLLAR)
-	    (*bufp)++;
-	return 1;
-	}
-    else if (**bufp == TEXPERCENT)
-	{
-	if (!TeX_comment)
-	    {
-	    save_math_mode = math_mode;
-	    save_LaTeX_Mode = LaTeX_Mode;
-	    math_mode = 0;
-	    LaTeX_Mode = 'P';
-	    TeX_comment = 1;
-	    }
-	return 0;
-	}
+    if(**bufp == TEXDOLLAR)
+    {
+        if((*bufp)[1] == TEXDOLLAR)
+            (*bufp)++;
+        return 1;
+    }
+    else if(**bufp == TEXPERCENT)
+    {
+        if(!TeX_comment)
+        {
+            save_math_mode = math_mode;
+            save_LaTeX_Mode = LaTeX_Mode;
+            math_mode = 0;
+            LaTeX_Mode = 'P';
+            TeX_comment = 1;
+        }
+        return 0;
+    }
     /* processing extended TeX command */
     (*bufp)++;
-    if (**bufp == TEXRIGHTPAREN  ||  **bufp == TEXRIGHTSQUARE)
-	return 1;
-    if (TeX_LR_begin (bufp))	/* check for switch back to LR mode */
-	return 1;
-    if (TeX_strncmp (*bufp, "end", 3) == 0)
-	/* find environment that is ending */
-	return TeX_math_check ('e', bufp);
+    if(**bufp == TEXRIGHTPAREN || **bufp == TEXRIGHTSQUARE)
+        return 1;
+    if(TeX_LR_begin(bufp)) /* check for switch back to LR mode */
+        return 1;
+    if(TeX_strncmp(*bufp, "end", 3) == 0)
+        /* find environment that is ending */
+        return TeX_math_check('e', bufp);
     else
-	return 0;
-    }
+        return 0;
+}
 
-static int TeX_math_begin (bufp)
-    char **	bufp;
+static int TeX_math_begin(bufp) char **bufp;
+{
+
+    if(**bufp == TEXDOLLAR)
     {
-
-    if (**bufp == TEXDOLLAR)
-	{
-	if ((*bufp)[1] == TEXDOLLAR)
-	    (*bufp)++;
-	return 1;
-	}
-    while (**bufp == TEXBACKSLASH)
-	{
-	(*bufp)++; /* check for null char here? */
-	if (**bufp == TEXLEFTPAREN  ||  **bufp == TEXLEFTSQUARE)
-	    return 1;
-	else if (!isalpha(**bufp)  &&  **bufp != '@')
-	    {
-	    (*bufp)++;
-	    continue;
-	    }
-	else if (TeX_strncmp (*bufp, "begin", 5) == 0)
-	    {
-	    if (TeX_math_check ('b', bufp))
-		return 1;
-	    else
-		(*bufp)--;
-	    }
-	else
-	    {
-	    TeX_skip_check (bufp);
-	    return 0;
-	    }
-	}
-      /*
-       * Ignore references for the tib (1) bibliography system, that
-       * is, text between a ``[.'' or ``<.'' and ``.]'' or ``.>''.
-       * We don't care whether they match, tib doesn't care either.
-       *
-       * A limitation is that the entire tib reference must be on one
-       * line, or we break down and check the remainder anyway.
-       */ 
-    if ((**bufp == TEXLEFTSQUARE  ||  **bufp == TEXLEFTANGLE)
-      &&  (*bufp)[1] == TEXDOT)
-	{
-	(*bufp)++;
-	while (**bufp)
-	    {
-	    if (*(*bufp)++ == TEXDOT
-	      &&  (**bufp == TEXRIGHTSQUARE  ||  **bufp == TEXRIGHTANGLE))
-		return TeX_math_begin (bufp);
-	    }
-	return 0;
-	}
-    else
-	return 0;
+        if((*bufp)[1] == TEXDOLLAR)
+            (*bufp)++;
+        return 1;
     }
-
-static int TeX_LR_begin (bufp)
-    char **	bufp;
+    while(**bufp == TEXBACKSLASH)
     {
-
-    if ((TeX_strncmp (*bufp, "mbox", 4) == 0)
-      ||  (TeX_strncmp (*bufp, "makebox", 7) == 0)
-      ||  (TeX_strncmp (*bufp, "fbox", 4) == 0)
-      || (TeX_strncmp (*bufp, "framebox", 8) == 0))
-	math_mode += 2;
-    else if ((TeX_strncmp(*bufp, "parbox", 6) == 0)
-      || (TeX_strncmp(*bufp, "raisebox", 8) == 0))
-	{
-	math_mode += 2;
-	TeX_open_paren (bufp);
-	if (**bufp)
-	    (*bufp)++;
-	else
-	    LaTeX_Mode = 'r'; /* same as reference -- skip {} */
-	}
-    else if (TeX_strncmp(*bufp, "begin", 5) == 0)
-	return TeX_LR_check (1, bufp);	/* minipage */
+        (*bufp)++; /* check for null char here? */
+        if(**bufp == TEXLEFTPAREN || **bufp == TEXLEFTSQUARE)
+            return 1;
+        else if(!isalpha(**bufp) && **bufp != '@')
+        {
+            (*bufp)++;
+            continue;
+        }
+        else if(TeX_strncmp(*bufp, "begin", 5) == 0)
+        {
+            if(TeX_math_check('b', bufp))
+                return 1;
+            else
+                (*bufp)--;
+        }
+        else
+        {
+            TeX_skip_check(bufp);
+            return 0;
+        }
+    }
+    /*
+     * Ignore references for the tib (1) bibliography system, that
+     * is, text between a ``[.'' or ``<.'' and ``.]'' or ``.>''.
+     * We don't care whether they match, tib doesn't care either.
+     *
+     * A limitation is that the entire tib reference must be on one
+     * line, or we break down and check the remainder anyway.
+     */
+    if((**bufp == TEXLEFTSQUARE || **bufp == TEXLEFTANGLE) && (*bufp)[1] == TEXDOT)
+    {
+        (*bufp)++;
+        while(**bufp)
+        {
+            if(*(*bufp)++ == TEXDOT && (**bufp == TEXRIGHTSQUARE || **bufp == TEXRIGHTANGLE))
+                return TeX_math_begin(bufp);
+        }
+        return 0;
+    }
     else
-	return 0;
+        return 0;
+}
+
+static int TeX_LR_begin(bufp) char **bufp;
+{
+
+    if((TeX_strncmp(*bufp, "mbox", 4) == 0) || (TeX_strncmp(*bufp, "makebox", 7) == 0) ||
+       (TeX_strncmp(*bufp, "fbox", 4) == 0) || (TeX_strncmp(*bufp, "framebox", 8) == 0))
+        math_mode += 2;
+    else if((TeX_strncmp(*bufp, "parbox", 6) == 0) ||
+            (TeX_strncmp(*bufp, "raisebox", 8) == 0))
+    {
+        math_mode += 2;
+        TeX_open_paren(bufp);
+        if(**bufp)
+            (*bufp)++;
+        else
+            LaTeX_Mode = 'r'; /* same as reference -- skip {} */
+    }
+    else if(TeX_strncmp(*bufp, "begin", 5) == 0)
+        return TeX_LR_check(1, bufp); /* minipage */
+    else
+        return 0;
 
     /* skip tex command name and optional or width arguments. */
-    TeX_open_paren (bufp);
+    TeX_open_paren(bufp);
     return 1;
-    }
+}
 
-static int TeX_LR_check (begin_p, bufp)
-    int		begin_p;
-    char **	bufp;
+static int TeX_LR_check(begin_p, bufp) int begin_p;
+char **bufp;
+{
+
+    TeX_open_paren(bufp);
+    if(**bufp == 0) /* { */
     {
-
-    TeX_open_paren (bufp);
-    if (**bufp == 0)	/* { */
-	{
-	LaTeX_Mode = 'm';
-	return 0;	/* remain in math mode until '}' encountered. */
-	}
+        LaTeX_Mode = 'm';
+        return 0; /* remain in math mode until '}' encountered. */
+    }
     else
-	LaTeX_Mode = 'P';
-    if (strncmp (++(*bufp), "minipage", 8) == 0)
-	{
-	TeX_skip_parens (bufp);
-	if (**bufp)
-	    (*bufp)++;
-	if (begin_p)
-	    {
-	    TeX_skip_parens (bufp); /* now skip opt. args if on this line. */
-	    math_mode += 2;
-	    /* indicate minipage mode. */
-	    math_mode += ((math_mode & 127) - 1) * 128;
-	    }
-	else
-	    {
-	    math_mode -= (math_mode & 127) * 128;
-	    if (math_mode < 0)
-		{
-		(void) fprintf (stderr, DEFMT_C_LR_MATH_ERROR);
-		math_mode = 1;
-		}
-	    }
-	return 1;
-	}
+        LaTeX_Mode = 'P';
+    if(strncmp(++(*bufp), "minipage", 8) == 0)
+    {
+        TeX_skip_parens(bufp);
+        if(**bufp)
+            (*bufp)++;
+        if(begin_p)
+        {
+            TeX_skip_parens(bufp); /* now skip opt. args if on this line. */
+            math_mode += 2;
+            /* indicate minipage mode. */
+            math_mode += ((math_mode & 127) - 1) * 128;
+        }
+        else
+        {
+            math_mode -= (math_mode & 127) * 128;
+            if(math_mode < 0)
+            {
+                (void)fprintf(stderr, DEFMT_C_LR_MATH_ERROR);
+                math_mode = 1;
+            }
+        }
+        return 1;
+    }
     (*bufp)--;
     return 0;
-    }
+}
 
 /* Skips the begin{ARG}, and optionally up to two {PARAM}{PARAM}'s to
  *  the begin if they are required.  However, Only skips if on this line.
  */
-static void TeX_skip_args (bufp)
-    char **	bufp;
-    {
+static void TeX_skip_args(bufp) char **bufp;
+{
     register int skip_cnt = 0; /* Max of 2. */
 
-    if (strncmp(*bufp, "tabular", 7) == 0
-      ||  strncmp(*bufp, "minipage", 8) == 0)
-	skip_cnt++;
-    if (strncmp(*bufp, "tabular*", 8) == 0)
-	skip_cnt++;
-    TeX_skip_parens (bufp);	/* Skip to the end of the \begin{} parens */
-    if (**bufp)
-	(*bufp)++;
+    if(strncmp(*bufp, "tabular", 7) == 0 || strncmp(*bufp, "minipage", 8) == 0)
+        skip_cnt++;
+    if(strncmp(*bufp, "tabular*", 8) == 0)
+        skip_cnt++;
+    TeX_skip_parens(bufp); /* Skip to the end of the \begin{} parens */
+    if(**bufp)
+        (*bufp)++;
     else
-	return;
-    if (skip_cnt--)
-	TeX_skip_parens (bufp);	/* skip 1st {PARAM}. */
+        return;
+    if(skip_cnt--)
+        TeX_skip_parens(bufp); /* skip 1st {PARAM}. */
     else
-	return;
-    if (**bufp)
-	(*bufp)++;
+        return;
+    if(**bufp)
+        (*bufp)++;
     else
-	return;
-    if (skip_cnt)
-	TeX_skip_parens (bufp);	/* skip to end of 2nd {PARAM}. */
-    }
+        return;
+    if(skip_cnt)
+        TeX_skip_parens(bufp); /* skip to end of 2nd {PARAM}. */
+}
 
-static int TeX_math_check (cont_char, bufp)
-    int		cont_char;
-    char **	bufp;
-    {
+static int TeX_math_check(cont_char, bufp) int cont_char;
+char **bufp;
+{
 
-    TeX_open_paren (bufp);
+    TeX_open_paren(bufp);
     /* Check for end of line, continue later. */
-    if (**bufp == 0)
-	{
-	LaTeX_Mode = (char) cont_char;
-	return 0;
-	}
+    if(**bufp == 0)
+    {
+        LaTeX_Mode = (char)cont_char;
+        return 0;
+    }
     else
-	LaTeX_Mode = 'P';
+        LaTeX_Mode = 'P';
 
-    if (strncmp (++(*bufp), "equation", 8) == 0
-      ||  strncmp (*bufp, "eqnarray", 8) == 0
-      ||  strncmp (*bufp, "displaymath", 11) == 0
-      ||  strncmp (*bufp, "picture", 7) == 0
+    if(strncmp(++(*bufp), "equation", 8) == 0 || strncmp(*bufp, "eqnarray", 8) == 0 ||
+       strncmp(*bufp, "displaymath", 11) == 0 || strncmp(*bufp, "picture", 7) == 0
 #ifdef IGNOREBIB
-      ||  strncmp (*bufp, "thebibliography", 15) == 0
+       || strncmp(*bufp, "thebibliography", 15) == 0
 #endif
-      ||  strncmp (*bufp, "math", 4) == 0)
-	{
-	(*bufp)--;
-	TeX_skip_parens (bufp);
-	return 1;
-	}
-    if (cont_char == 'b')
-	TeX_skip_args (bufp);
+       || strncmp(*bufp, "math", 4) == 0)
+    {
+        (*bufp)--;
+        TeX_skip_parens(bufp);
+        return 1;
+    }
+    if(cont_char == 'b')
+        TeX_skip_args(bufp);
     else
-	TeX_skip_parens (bufp);
+        TeX_skip_parens(bufp);
     return 0;
-    }
+}
 
-static void TeX_skip_parens (bufp)
-    char **	bufp;
-    {
+static void TeX_skip_parens(bufp) char **bufp;
+{
 
-    while (**bufp  &&  **bufp != TEXRIGHTCURLY  &&  **bufp != TEXDOLLAR)
-	(*bufp)++;
-    }
+    while(**bufp && **bufp != TEXRIGHTCURLY && **bufp != TEXDOLLAR)
+        (*bufp)++;
+}
 
-static void TeX_open_paren (bufp)
-    char **	bufp;
-    {
-    while (**bufp  &&  **bufp != TEXLEFTCURLY  &&  **bufp != TEXDOLLAR)
-	(*bufp)++;
-    }
+static void TeX_open_paren(bufp) char **bufp;
+{
+    while(**bufp && **bufp != TEXLEFTCURLY && **bufp != TEXDOLLAR)
+        (*bufp)++;
+}
 
-static void TeX_skip_check (bufp)
-    char **	bufp;
-    {
-    int		skip_ch;
+static void TeX_skip_check(bufp) char **bufp;
+{
+    int skip_ch;
 
-    if (TeX_strncmp(*bufp, "end", 3) == 0
-      ||  TeX_strncmp(*bufp, "vspace", 6) == 0
-      ||  TeX_strncmp(*bufp, "hspace", 6) == 0
-      ||  TeX_strncmp(*bufp, "cite", 4) == 0
-      ||  TeX_strncmp(*bufp, "ref", 3) == 0
-      ||  TeX_strncmp(*bufp, "parbox", 6) == 0
-      ||  TeX_strncmp(*bufp, "label", 5) == 0
-      ||  TeX_strncmp(*bufp, "input", 5) == 0
-      ||  TeX_strncmp(*bufp, "nocite", 6) == 0
-      ||  TeX_strncmp(*bufp, "include", 7) == 0
-      ||  TeX_strncmp(*bufp, "includeonly", 11) == 0
-      ||  TeX_strncmp(*bufp, "documentstyle", 13) == 0
-      ||  TeX_strncmp(*bufp, "documentclass", 13) == 0
-      ||  TeX_strncmp(*bufp, "usepackage", 10) == 0
-      ||  TeX_strncmp(*bufp, "pagestyle", 9) == 0
-      ||  TeX_strncmp(*bufp, "pagenumbering", 13) == 0
+    if(TeX_strncmp(*bufp, "end", 3) == 0 || TeX_strncmp(*bufp, "vspace", 6) == 0 ||
+       TeX_strncmp(*bufp, "hspace", 6) == 0 || TeX_strncmp(*bufp, "cite", 4) == 0 ||
+       TeX_strncmp(*bufp, "ref", 3) == 0 || TeX_strncmp(*bufp, "parbox", 6) == 0 ||
+       TeX_strncmp(*bufp, "label", 5) == 0 || TeX_strncmp(*bufp, "input", 5) == 0 ||
+       TeX_strncmp(*bufp, "nocite", 6) == 0 || TeX_strncmp(*bufp, "include", 7) == 0 ||
+       TeX_strncmp(*bufp, "includeonly", 11) == 0 ||
+       TeX_strncmp(*bufp, "documentstyle", 13) == 0 ||
+       TeX_strncmp(*bufp, "documentclass", 13) == 0 ||
+       TeX_strncmp(*bufp, "usepackage", 10) == 0 ||
+       TeX_strncmp(*bufp, "pagestyle", 9) == 0 ||
+       TeX_strncmp(*bufp, "pagenumbering", 13) == 0
 #ifndef IGNOREBIB
-      ||  TeX_strncmp(*bufp, "bibliography", 12) == 0
-      ||  TeX_strncmp(*bufp, "bibitem", 7) == 0
+       || TeX_strncmp(*bufp, "bibliography", 12) == 0 ||
+       TeX_strncmp(*bufp, "bibitem", 7) == 0
 #endif
-      ||  TeX_strncmp(*bufp, "hyphenation", 11) == 0
-      ||  TeX_strncmp(*bufp, "pageref", 7) == 0)
-	{
-	TeX_skip_parens (bufp);
-	if (**bufp == 0)
-	    LaTeX_Mode = 'r';
-	}
-    else if (TeX_strncmp(*bufp, "rule", 4) == 0		/* skip two args. */
-      ||  TeX_strncmp(*bufp, "setcounter", 10) == 0
-      ||  TeX_strncmp(*bufp, "addtocounter", 12) == 0
-      ||  TeX_strncmp(*bufp, "setlength", 9) == 0
-      ||  TeX_strncmp(*bufp, "addtolength", 11) == 0
-      ||  TeX_strncmp(*bufp, "settowidth", 10) == 0)
-	{
-	TeX_skip_parens (bufp);
-	if (**bufp == 0)	/* Only skips one {} if not on same line. */
-	    LaTeX_Mode = 'r';
-	else			/* Skip second arg. */
-	    {
-	    (*bufp)++;
-	    TeX_skip_parens (bufp);
-	    if (**bufp == 0)
-		LaTeX_Mode = 'r';
-	    }
-	}
-    else if (TeX_strncmp (*bufp, "verb", 4) == 0)
-	{
-	skip_ch = (*bufp)[4];
-	*bufp += 5;
-	while (**bufp != skip_ch  &&  **bufp != '\0')
-	    (*bufp)++;
-	}
-    else
-	{
-	/* Optional tex arguments sometimes should and
-	** sometimes shouldn't be checked
-	** (eg \section [C Programming] {foo} vs
-	**     \rule [3em] {0.015in} {5em})
-	** SO -- we'll always spell-check it rather than make a
-	** full LaTeX parser.
-	*/
-
-	/* Must look at the space after the command. */
-	while (isalpha(**bufp)  ||  **bufp == '@')
-	    (*bufp)++;
-	/*
-	** Our caller expects to skip over a single character.  So we
-	** need to back up by one.  Ugh.
-	*/
-	(*bufp)--;
-	}
+       || TeX_strncmp(*bufp, "hyphenation", 11) == 0 ||
+       TeX_strncmp(*bufp, "pageref", 7) == 0)
+    {
+        TeX_skip_parens(bufp);
+        if(**bufp == 0)
+            LaTeX_Mode = 'r';
     }
+    else if(TeX_strncmp(*bufp, "rule", 4) == 0 /* skip two args. */
+            || TeX_strncmp(*bufp, "setcounter", 10) == 0 ||
+            TeX_strncmp(*bufp, "addtocounter", 12) == 0 ||
+            TeX_strncmp(*bufp, "setlength", 9) == 0 ||
+            TeX_strncmp(*bufp, "addtolength", 11) == 0 ||
+            TeX_strncmp(*bufp, "settowidth", 10) == 0)
+    {
+        TeX_skip_parens(bufp);
+        if(**bufp == 0) /* Only skips one {} if not on same line. */
+            LaTeX_Mode = 'r';
+        else /* Skip second arg. */
+        {
+            (*bufp)++;
+            TeX_skip_parens(bufp);
+            if(**bufp == 0)
+                LaTeX_Mode = 'r';
+        }
+    }
+    else if(TeX_strncmp(*bufp, "verb", 4) == 0)
+    {
+        skip_ch = (*bufp)[4];
+        *bufp += 5;
+        while(**bufp != skip_ch && **bufp != '\0')
+            (*bufp)++;
+    }
+    else
+    {
+        /* Optional tex arguments sometimes should and
+        ** sometimes shouldn't be checked
+        ** (eg \section [C Programming] {foo} vs
+        **     \rule [3em] {0.015in} {5em})
+        ** SO -- we'll always spell-check it rather than make a
+        ** full LaTeX parser.
+        */
+
+        /* Must look at the space after the command. */
+        while(isalpha(**bufp) || **bufp == '@')
+            (*bufp)++;
+        /*
+        ** Our caller expects to skip over a single character.  So we
+        ** need to back up by one.  Ugh.
+        */
+        (*bufp)--;
+    }
+}
 
 /*
  * TeX_strncmp is like strncmp, except that it returns inequality if
@@ -884,18 +838,17 @@ static void TeX_skip_check (bufp)
  * header, but I doubt that it varies, and I don't want to change the
  * syntax of affix files right now.
  */
-static int TeX_strncmp (a, b, n)
-    char *	a;		/* Strings to compare */
-    char *	b;		/* ... */
-    int		n;		/* Number of characters to compare */
-    {
-    int		cmpresult;	/* Result of calling strncmp */
+static int TeX_strncmp(a, b, n) char *a; /* Strings to compare */
+char *b; /* ... */
+int n; /* Number of characters to compare */
+{
+    int cmpresult; /* Result of calling strncmp */
 
-    cmpresult = strncmp (a, b, n);
-    if (cmpresult == 0)
-	{
-	if (isascii (a[n])  &&  isalpha (a[n]))
-	    return 1;		/* Force inequality if alpha follows */
-	}
-    return cmpresult;
+    cmpresult = strncmp(a, b, n);
+    if(cmpresult == 0)
+    {
+        if(isascii(a[n]) && isalpha(a[n]))
+            return 1; /* Force inequality if alpha follows */
     }
+    return cmpresult;
+}

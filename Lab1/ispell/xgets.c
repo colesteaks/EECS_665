@@ -1,6 +1,5 @@
 #ifndef lint
-static char Rcs_Id[] =
-    "$Id: xgets.c,v 1.22 1994/09/16 04:48:34 geoff Exp $";
+static char Rcs_Id[] = "$Id: xgets.c,v 1.22 1994/09/16 04:48:34 geoff Exp $";
 #endif
 
 /*
@@ -56,10 +55,10 @@ static char Rcs_Id[] =
 #include "ispell.h"
 #include "proto.h"
 
-char *		xgets P ((char * string, int size, FILE * stream));
+char *xgets P((char *string, int size, FILE *stream));
 
 #ifndef MAXINCLUDEFILES
-#define MAXINCLUDEFILES	1	/* maximum number of new files in stack */
+#define MAXINCLUDEFILES 1 /* maximum number of new files in stack */
 #endif
 
 /*
@@ -72,77 +71,75 @@ char *		xgets P ((char * string, int size, FILE * stream));
  *  Mark Davies -- mark@vuwcomp  Mon May 11 22:38:10 NZST 1987
  */
 
-char * xgets (str, size, stream)
-    char		str[];
-    int			size;
-    FILE *		stream;
-    {
+char *xgets(str, size, stream) char str[];
+int size;
+FILE *stream;
+{
 #if MAXINCLUDEFILES == 0
-    return fgets (str, size, stream);
+    return fgets(str, size, stream);
 #else
-    static char *	Include_File = DEFINCSTR;
-    static int		Include_Len = 0;
-    static FILE *	F[MAXINCLUDEFILES+1];
-    static FILE **	current_F = F;
-    char *		s = str;
-    int			c;
+    static char *Include_File = DEFINCSTR;
+    static int Include_Len = 0;
+    static FILE *F[MAXINCLUDEFILES + 1];
+    static FILE **current_F = F;
+    char *s = str;
+    int c;
 
     /* read the environment variable if we havent already */
-    if (Include_Len == 0)
-	{
-	char *		env_variable;
+    if(Include_Len == 0)
+    {
+        char *env_variable;
 
-	if ((env_variable = getenv (INCSTRVAR)) != NULL)
-	    Include_File = env_variable;
-	Include_Len = strlen (Include_File);
+        if((env_variable = getenv(INCSTRVAR)) != NULL)
+            Include_File = env_variable;
+        Include_Len = strlen(Include_File);
 
-	/* initialise the file stack */
-	*current_F = stream;
-	}
+        /* initialise the file stack */
+        *current_F = stream;
+    }
 
-    for (  ;  ;  )
-	{
-	c = '\0';
-        if ((s - str) + 1 < size
-          &&  (c = getc (*current_F)) != EOF)
-	    {
-	    *s++ = (char) c;
-	    if (c != '\n')
-		continue;
-	    }
-	*s = '\0';		/* end of line */
-	if (c == EOF)
-	    {
-	    if (current_F == F) /* if end of standard input */
-		{
-		if (s == str)
-		    return (NULL);
-		}
-	    else
-		{
-	        (void) fclose (*(current_F--));
-	      	if (s == str) continue;
-		}
-	    }
+    for(;;)
+    {
+        c = '\0';
+        if((s - str) + 1 < size && (c = getc(*current_F)) != EOF)
+        {
+            *s++ = (char)c;
+            if(c != '\n')
+                continue;
+        }
+        *s = '\0'; /* end of line */
+        if(c == EOF)
+        {
+            if(current_F == F) /* if end of standard input */
+            {
+                if(s == str)
+                    return (NULL);
+            }
+            else
+            {
+                (void)fclose(*(current_F--));
+                if(s == str)
+                    continue;
+            }
+        }
 
-	if (incfileflag != 0
-	  &&  strncmp (str, Include_File, (unsigned int) Include_Len) == 0)
-	    {
-	    char *	file_name = str + Include_Len;
+        if(incfileflag != 0 && strncmp(str, Include_File, (unsigned int)Include_Len) == 0)
+        {
+            char *file_name = str + Include_Len;
 
-	    if (current_F - F < MAXINCLUDEFILES  &&  strlen (file_name) != 0)
-		{
-		FILE *	f;
+            if(current_F - F < MAXINCLUDEFILES && strlen(file_name) != 0)
+            {
+                FILE *f;
 
-		if (f = fopen (file_name, "r"))
-		    *(++current_F) = f;
-		}
-	    s = str;
-	    continue;
-	    }
-	break;
-	}
-    
+                if(f = fopen(file_name, "r"))
+                    *(++current_F) = f;
+            }
+            s = str;
+            continue;
+        }
+        break;
+    }
+
     return (str);
 #endif
-    }
+}

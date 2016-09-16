@@ -79,19 +79,19 @@
  * WARNING WARNING WARNING
  */
 
-#define MINIMENU	/* Display a mini-menu at the bottom of the screen */
-#define NO8BIT		/* Remove this if you use ISO character sets */
-#undef USG		/* Define this on System V */
+#define MINIMENU /* Display a mini-menu at the bottom of the screen */
+#define NO8BIT /* Remove this if you use ISO character sets */
+#undef USG /* Define this on System V */
 
 /*
  * Important directory paths
  */
-#define BINDIR	"/usr/local/bin"
-#define LIBDIR	"."
+#define BINDIR "/usr/local/bin"
+#define LIBDIR "."
 #define ELISPDIR "/usr/local/lib/emacs/site-lisp"
 #define TEXINFODIR "/usr/local/info"
-#define MAN1DIR	"/usr/local/man/man1"
-#define MAN4DIR	"/usr/local/man/man4"
+#define MAN1DIR "/usr/local/man/man1"
+#define MAN4DIR "/usr/local/man/man4"
 
 /*
  * Place any locally-required #include statements here
