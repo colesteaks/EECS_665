@@ -25,7 +25,7 @@ test: test.out
 clean:
 	$(RM) *.o
 	$(RM) *.lex.c
-	$(RM) *.out
+	$(RM) test.out
 	$(RM) *.log *.aux
 	$(RM) lexer
 

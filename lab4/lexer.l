@@ -12,7 +12,9 @@ int list_type;
 
 %option noyywrap nounput yylineno
 ID [a-zA-Z][a-zA-Z0-9_]*
-%x COMMENT
+PREPROC "\#".
+
+%x INCOMMENT INLINECOMMENT
 
 %%
 "//" {
@@ -20,10 +22,10 @@ ID [a-zA-Z][a-zA-Z0-9_]*
 * Matching with Single line comments in our
 * C code
 ******************************************/
-BEGIN COMMENT;
+BEGIN INLINECOMMENT;
 }
 
-<COMMENT>[\n](\r)? {
+<INLINECOMMENT>[\n](\r)? {
 /****************************************
 * A new line indicates end of a single
 * line comment in C
@@ -32,17 +34,50 @@ BEGIN COMMENT;
 BEGIN 0;
 }
 
-<COMMENT>[ \t] {
+<INLINECOMMENT>[ \t] {
 /****************************************
 * Lexer ignores the comments section
 * by Ignoring anything inside a comment
 ****************************************/
 }
 
-
-
-<COMMENT>. {
+<INLINECOMMENT>. {
 }
+
+"/*" {
+/****************************************
+* Matching with Single line comments in our
+* C code
+******************************************/
+BEGIN INLINECOMMENT;
+}
+
+<INCOMMENT>"*/" {
+/****************************************
+* A new line indicates end of a single
+* line comment in C
+****************************************/
+BEGIN 0;
+}
+
+<INCOMMENT>[ \t] {
+/****************************************
+* Lexer ignores the comments section
+* by Ignoring anything inside a comment
+****************************************/
+}
+
+<INCOMMENT>. {
+}
+
+"\#". {
+  /***********************
+  * Preprocessor command
+  ***********************/
+  return PREPROC;
+}
+
+
 
 {ID} {
 /**************************************
