@@ -11,8 +11,15 @@ int list_type;
 %}
 
 %option noyywrap nounput yylineno
-ID [a-zA-Z][a-zA-Z0-9_]*
-PREPROC "\#".
+ID        [a-zA-Z][a-zA-Z0-9_]*
+PREPROC   "#".\n
+
+INTVAL    [0-9]+|[0-7]+|[0-16]+
+DBLVAL    [0-9]+"."[0-9]+
+FLTVAL    [0-9]+"."[0-9]+"f"
+CHARVAL   \'.\'
+STRVAL    \".\"
+
 
 %x INCOMMENT INLINECOMMENT
 
@@ -70,14 +77,13 @@ BEGIN 0;
 <INCOMMENT>. {
 }
 
-"\#". {
+{PREPROC} {
   /***********************
   * Preprocessor command
   ***********************/
-  return PREPROC;
+  printf("PREPROC\n");
+  //return PREPROC;
 }
-
-
 
 {ID} {
 /**************************************
@@ -87,6 +93,38 @@ BEGIN 0;
 
 printf("ID\n");
 return ID;
+}
+
+"(" {
+  printf("(\n");
+}
+
+")" {
+  printf(")\n");
+}
+
+"[" {
+  printf("[\n");
+}
+
+"]" {
+  printf("]\n");
+}
+
+"," {
+  printf(",\n");
+}
+
+";" {
+  printf(";\n");
+}
+
+"{" {
+  printf("{\n");
+}
+
+"}" {
+  printf("}\n");
 }
 
 %%
