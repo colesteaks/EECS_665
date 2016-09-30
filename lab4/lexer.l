@@ -79,13 +79,13 @@ int list_type;
 
 %option noyywrap nounput yylineno
 ID        [a-zA-Z][a-zA-Z0-9_]*
-PREPROC   "#".
+PREPROC   "#"[^\n]*\n
 
 INTVAL    [0-9]+|"0"[0-7]*|"0x"[0-9a-fA-F]*
 DBLVAL    [0-9]+"."[0-9]+
 FLTVAL    [0-9]+"."[0-9]+"f"
-CHARVAL   \'.\'
-STRVAL    \".\"
+CHARVAL   \'([^']|\\.)*\'
+STRVAL    \"([^"]|\\.)*\"
 
 VOID      "void"
 SHORT     "short"
@@ -184,7 +184,7 @@ BEGIN 0;
 * Matching with Single line comments in our
 * C code
 ******************************************/
-BEGIN INLINECOMMENT;
+BEGIN INCOMMENT;
 }
 
 <INCOMMENT>"*/" {
@@ -200,6 +200,9 @@ BEGIN 0;
 * Lexer ignores the comments section
 * by Ignoring anything inside a comment
 ****************************************/
+}
+
+<INCOMMENT>[\n](\r)? {
 }
 
 <INCOMMENT>. {
@@ -236,6 +239,7 @@ BEGIN 0;
   printf("STRVAL\n");
   return STRVAL;
 }
+
 {VOID} {
   printf("VOID\n");
   return VOID;
@@ -465,35 +469,35 @@ BEGIN 0;
   return SIZEOF;
 }
 
-"(" {
+\( {
   printf("(\n");
 }
 
-")" {
+\) {
   printf(")\n");
 }
 
-"[" {
+\[ {
   printf("[\n");
 }
 
-"]" {
+\] {
   printf("]\n");
 }
 
-"," {
+\, {
   printf(",\n");
 }
 
-";" {
+\; {
   printf(";\n");
 }
 
-"{" {
+\{ {
   printf("{\n");
 }
 
-"}" {
+\} {
   printf("}\n");
 }
 
@@ -507,12 +511,15 @@ printf("ID\n");
 return ID;
 }
 
+[ \t\n\r] {
+}
+
 %%
 int main(int argc, const char* argv[])
 {
   /*Make a call to yylex() recursively. Whenever yylex() is called, it scans tokens from the
     global input file yyin (which defaults to stdin). It continues until it either reaches an
     end-of-file (at which point it returns the value 0) or one of its actions executes a return statement.*/
-  yylex();
+while(yylex()){};
 return 0;
 }

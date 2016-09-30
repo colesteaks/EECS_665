@@ -2,7 +2,7 @@ LEX=lex
 YACC=yacc
 CC=gcc
 
-LFLAGS=
+LFLAGS=-d
 CFLAGS=-Wall -Wno-unused-label -Wno-unused -g
 
 all: lexer
@@ -20,12 +20,15 @@ lexer: lexer.lex.o
 	./lexer < $< > $@
 
 test: test.out
-		diff test.out result.out
+		diff test.out test_result.out
+
+demo: demo.out
+		diff demo.out demo_result.out
 
 clean:
 	$(RM) *.o
 	$(RM) *.lex.c
-	$(RM) test.out
+	$(RM) test.out demo.out
 	$(RM) *.log *.aux
 	$(RM) lexer
 
