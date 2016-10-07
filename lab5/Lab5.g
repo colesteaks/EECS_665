@@ -51,11 +51,11 @@ fragment HEX: ('0' .. '9' | 'A' .. 'F' | 'a' .. 'f');
 WS : (' ' | '\t' | '\r' | '\n')+ { $channel=HIDDEN; };
 
 // The decimal value lexer rule. Match one or more decimal digits.
-DECIMAL 	: DEC+ ;
 OCTAL		: '0' OCT+;
 HEXIDECIMAL	: '0x' HEX+;
 BINARY		: '0b' BIN+;
 REAL		: DEC+ '.' DEC+;
+DECIMAL 	: DEC+ ;
 
 // The top rule. You should replace this with your own rule definition to
 // parse expressions according to the assignment.
@@ -63,36 +63,38 @@ top : expr EOF
       | EOF
       ;
 
-expr : paren { System.out.println( $term.value ); } ;
+expr : l = pm { System.out.println( $l.value ); } ;
 
-pm returns [int value] : l = digit { $value = $l.value; }
- (( PLUS r = digit { $value += $r.value; } )*
- |( MINUS r = digit {$value -= $r.value; } )*)* ;
+pm returns [double value] : l = md { $value = $l.value; }
+ (( PLUS r = md { $value += $r.value; } )
+ |( MINUS r = md {$value -= $r.value; } ))* ;
  
-md returns [int value] : l = pm { $value = $l.value }
-(( DIV r = pm {if($r.value == 0) {
+md returns [double value] : l = ex { $value = $l.value; }
+(( DIV r = ex {if($r.value == 0) {
 			System.out.print("Error: Divide by zero");
 		}  else {
 			$value /= $r.value;
 		}
-	} )*
- |( MULT r = pm {$value *= $r.value; } )*)*;
+	} )
+ |( MULT r = ex {$value *= $r.value; } ))*;
  
-ex returns [int value] : l = md {$value = $l.value}
- (|(EXP r = pm { Math.pow($value, $r.value) }));
+ex returns [double value] : l = paren {$value = $l.value;}
+ (|(EXP r = paren { Math.pow($value, $r.value); }));
  
-paren returns [int value] : l = ex {$value = $l.value}
- | ( LPAREN ex RPAREN {ex.value} )*;
+paren returns [double value] : LPAREN l = pm RPAREN {$value = $l.value;}
+ | l = digit  {$value = $l.value;} 
+ | l = func   {$value = $l.value;} ;
 
-func returns [int value] 
-	: LOG l = paren {$value = Math.log($value);}
-	| SIN l = paren {$value = Math.sin($value);}
-	| COS l = paren {$value = Math.cos($value);}
-	| TAN l = paren {$value = Math.tan($value);};
+func returns [double value] 
+	: LOG l = paren {$value = Math.log($l.value);}
+	| SIN l = paren {$value = Math.sin($l.value);}
+	| COS l = paren {$value = Math.cos($l.value);}
+	| TAN l = paren {$value = Math.tan($l.value);};
 
-digit returns [int value]
-: DECIMAL { $value = Integer.parseInt( $DECIMAL.getText(), 10 ); } 
- | HEXIDECIMAL { $value = Integer.parseInt( $HEXIDECIMAL.getText(), 10); }
- | BINARY { $value = Integer.parseInt( $BINARY.getText(), 10); }
- | OCTAL { $value = Integer.parseInt( $OCTAL.getText(), 10); } ;
+digit returns [double value]
+:  l = HEXIDECIMAL { $value = (double)Integer.decode( $l.getText()); }
+ | l = BINARY { $value = (double)Integer.parseInt( $l.getText(), 2); }
+ | l = OCTAL { $value = (double)Integer.decode( $l.getText()); } 
+ | l = REAL {$value = Double.parseDouble( $l.getText()); } 
+ | l = DECIMAL { $value = Integer.parseInt( $l.getText(), 10 ); };
  
