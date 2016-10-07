@@ -51,7 +51,11 @@ fragment HEX: ('0' .. '9' | 'A' .. 'F' | 'a' .. 'f');
 WS : (' ' | '\t' | '\r' | '\n')+ { $channel=HIDDEN; };
 
 // The decimal value lexer rule. Match one or more decimal digits.
-DECIMAL : DEC+ ;
+DECIMAL 	: DEC+ ;
+OCTAL		: '0' OCT+;
+HEXIDECIMAL	: '0x' HEX+;
+BINARY		: '0b' BIN+;
+REAL		: DEC+ '.' DEC+;
 
 // The top rule. You should replace this with your own rule definition to
 // parse expressions according to the assignment.
@@ -88,7 +92,7 @@ func returns [int value]
 
 digit returns [int value]
 : DECIMAL { $value = Integer.parseInt( $DECIMAL.getText(), 10 ); } 
- | HEX { $value = Integer.parseInt( $HEX.getText(), 10); }
- | BIN { $value = Integer.parseInt( $BIN.getText(), 10); }
- | OCT { $value = Integer.parseInt( $OCT.getText(), 10); } ;
+ | HEXIDECIMAL { $value = Integer.parseInt( $HEXIDECIMAL.getText(), 10); }
+ | BINARY { $value = Integer.parseInt( $BINARY.getText(), 10); }
+ | OCTAL { $value = Integer.parseInt( $OCTAL.getText(), 10); } ;
  
