@@ -8,6 +8,13 @@ tokens {
 	MINUS='-';
 	DIV='/';
 	MULT='*';
+	EXP='^';
+	LPAREN='(';
+	RPAREN=')';
+	LOG='log';
+	SIN='sin';
+	COS='cos';
+	TAN='tan';
 }
 
 // Written in the target language. The header section can be
@@ -52,14 +59,36 @@ top : expr EOF
       | EOF
       ;
 
-expr : term { System.out.println( $term.value ); } ;
+expr : paren { System.out.println( $term.value ); } ;
 
-term returns [int value] : l = digit { $value = $l.value; }
- ( PLUS r = digit { $value += $r.value; } )*
- ( MINUS r = digit {$value -= $r.value; } )*
- ( DIV r = digit {$value /= $r.value; } )*
- ( MULT r = digit {$value *= $r.value; } )* ;
+pm returns [int value] : l = digit { $value = $l.value; }
+ (( PLUS r = digit { $value += $r.value; } )*
+ |( MINUS r = digit {$value -= $r.value; } )*)* ;
+ 
+md returns [int value] : l = pm { $value = $l.value }
+(( DIV r = pm {if($r.value == 0) {
+			System.out.print("Error: Divide by zero");
+		}  else {
+			$value /= $r.value;
+		}
+	} )*
+ |( MULT r = pm {$value *= $r.value; } )*)*;
+ 
+ex returns [int value] : l = md {$value = $l.value}
+ (|(EXP r = pm { Math.pow($value, $r.value) }));
+ 
+paren returns [int value] : l = ex {$value = $l.value}
+ | ( LPAREN ex RPAREN {ex.value} )*;
 
+func returns [int value] 
+	: LOG l = paren {$value = Math.log($value);}
+	| SIN l = paren {$value = Math.sin($value);}
+	| COS l = paren {$value = Math.cos($value);}
+	| TAN l = paren {$value = Math.tan($value);};
 
-digit returns [int value] : DECIMAL { $value =
- Integer.parseInt( $DECIMAL.getText(), 10 ); } ;
+digit returns [int value]
+: DECIMAL { $value = Integer.parseInt( $DECIMAL.getText(), 10 ); } 
+ | HEX { $value = Integer.parseInt( $HEX.getText(), 10); }
+ | BIN { $value = Integer.parseInt( $BIN.getText(), 10); }
+ | OCT { $value = Integer.parseInt( $OCT.getText(), 10); } ;
+ 
