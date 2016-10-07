@@ -79,7 +79,7 @@ md returns [double value] : l = ex { $value = $l.value; }
  |( MULT r = ex {$value *= $r.value; } ))*;
  
 ex returns [double value] : l = paren {$value = $l.value;}
- (|(EXP r = paren { Math.pow($value, $r.value); }));
+ (EXP r = paren { $value = Math.pow($value, $r.value); })*;
  
 paren returns [double value] : LPAREN l = pm RPAREN {$value = $l.value;}
  | l = digit  {$value = $l.value;} 
