@@ -12,7 +12,7 @@ NFA::NFA() {
 NFA::~NFA() {}
 
 NFA::NFA(unordered_set<State*> startStates, unordered_set<State*> finalStates,
-       set<char> inputs, int totalStates, unordered_map<int, State*> states) {
+       vector<char> inputs, int totalStates, unordered_map<int, State*> states) {
   this->startStates = startStates;
   this->finalStates = finalStates;
   this->inputs = inputs;
@@ -21,7 +21,7 @@ NFA::NFA(unordered_set<State*> startStates, unordered_set<State*> finalStates,
 }
 
 
-
+//eclosure function as described in the book.
 unordered_set<int> NFA::eClosure(unordered_set<State*> states) {
   stack<State*> s;
   unordered_set<int> estates;
@@ -38,15 +38,15 @@ unordered_set<int> NFA::eClosure(unordered_set<State*> states) {
     for (auto itr = emoves.begin(); itr != emoves.end(); ++itr) {
       int check = *itr;
       if (estates.count(check) == 0) {
-        cout << "adding " << *itr << " to the stack" << endl;
         estates.insert(check);
         s.push(this->states[check]);
       }
     }
   }
+  return estates;
 }
 
-
+//determines a set of possible moves from a given set of states to a given input. 
 unordered_set<int> NFA::move(unordered_set<int> states, char input) {
   unordered_set<int> result;
   for (auto itr = states.begin(); itr != states.end(); ++itr) {

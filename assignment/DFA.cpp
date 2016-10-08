@@ -1,4 +1,4 @@
-#import "DFA.h"
+#include "DFA.h"
 
 using namespace std;
 
@@ -12,13 +12,13 @@ DFA::DFA() {
 
 DFA::~DFA() {}
 
+//Checks to see if a set of NFA states is already in the DFA asa state
 int DFA::checkDFA(unordered_set<int> set) {
   int id;
   for(auto itr = this->states.begin(); itr != this->states.end(); ++itr) {
     unordered_set<int> test = itr->second->nStates;
     unordered_set<int> diff;
     std::set_difference(set.begin(), set.end(), test.begin(), test.end(),std::inserter(diff, diff.begin()));
-    cout << "set is in DFA: " << diff.empty() << endl;
     if(diff.empty()) {
       return itr->first;
     }
@@ -26,23 +26,11 @@ int DFA::checkDFA(unordered_set<int> set) {
   return -1;
 }
 
-DState* DFA::addState(unordered_set<int> nstates) {
-  DState* ds = new DState();
-  ds->nStates = nstates;
-  ds->id = this->states.size() +1;
-  return ds;
-}
-
-// int DFA::findState(unordered_set<int> nstates) {
-//   for (auto state = this->states.begin(); state != this->states.end(); ++state) {
-//     DState* test = *state;
-//   }
-// }
-
-bool DFA::isFinal(DState* state, unordered_set<int> nfinals) {
-  for (auto ns = state->nStates.begin(); ns != state->nStates.end(); ++state) {
+//checks to see if the DState should be included in final states.
+bool DFA::isFinal(unordered_set<int> dstates, unordered_set<int> nfinals) {
+  for (auto ns = dstates.begin(); ns != dstates.end(); ++ns) {
     int sfind = *ns;
-    if(nfinals.find(sfind) !=state->nStates.end()) {
+    if(nfinals.find(sfind) != nfinals.end()) {
       return true;
     }
   }

@@ -4,7 +4,7 @@ GFLAGS=-std=c++14
 converter: main.o NFA.o State.o DFA.o DState.o
 	g++ -g $(GFLAGS) main.o NFA.o State.o DFA.o DState.o -o converter
 
-main.o: main.cpp NFA.h State.h
+main.o: main.cpp NFA.h State.h DFA.h DState.h
 	g++ -g $(GFLAGS) -c main.cpp
 
 NFA.o: NFA.cpp NFA.h State.h
