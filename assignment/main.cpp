@@ -178,7 +178,7 @@ int main(int argc, char const *argv[]) {
   in.erase(remove(in.begin(), in.end(), 'E'), in.end());
   dfa->inputs = in;
 
-  //use a stack to store unmarked DStates and pop as they are marked.
+  //use a queue to store unmarked DStates and pop as they are marked.
   queue<DState*> dstates;
   DState* first = new DState();
   unordered_set<int> t1 = nfa->eClosure(nfa->startStates);
@@ -250,6 +250,5 @@ int main(int argc, char const *argv[]) {
   cout << endl;
   printStates(dfa->states, dfa->inputs);
 
-  //TODO: make a general function to print out state list for NFA and DFA.
   return 0;
 }
