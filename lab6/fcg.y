@@ -27,7 +27,7 @@ extern int yylex();
  * The top level parsing rule, as set using the %start
  * directive above.
  ********************************************************/
-top : 
+top :
 |function top
 
 
