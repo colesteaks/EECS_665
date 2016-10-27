@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <fcg.yacc.h>
 
+
 #ifndef NDEBUG
 #    define DEBUGF(...) printf(__VA_ARGS__)
 #else
@@ -47,6 +48,7 @@ OR        "||"
 AND       "&&"
 BITOR     "|"
 BITAND    "&"
+BITXOR     "^"
 LSH       "<<"
 RSH       ">>"
 SET       "="
@@ -130,7 +132,37 @@ SIZEOF    "sizeof"
   *************************************************************************/
 %}
 
-{PREPROC}   { DEBUGF("PREPROC\n"); return PREPROC; }
+%{/*{PREPROC}   { DEBUGF("PREPROC\n"); return PREPROC; }
+{OR}        { DEBUGF("OR\n"); return OR; }
+{AND}       { DEBUGF("AND\n"); return AND; }
+{SETADD}    { DEBUGF("SETADD\n"); return SETADD; }
+{SETSUB}    { DEBUGF("SETSUB\n"); return SETSUB; }
+{SETMUL}    { DEBUGF("SETMUL\n"); return SETMUL; }
+{SETDIV}    { DEBUGF("SETDIV\n"); return SETDIV; }
+{SETMOD}    { DEBUGF("SETMOD\n"); return SETMOD; }
+{SETOR}     { DEBUGF("SETOR\n"); return SETOR; }
+{SETAND}    { DEBUGF("SETAND\n"); return SETAND; }
+{SETXOR}    { DEBUGF("SETXOR\n"); return SETXOR; }
+{SETLSH}    { DEBUGF("SETLSH\n"); return SETLSH; }
+{SETRSH}    { DEBUGF("SETRSH\n"); return SETRSH; }
+{DO}        { DEBUGF("DO\n"); return DO; }
+{FOR}       { DEBUGF("FOR\n"); return FOR; }
+{SWITCH}    { DEBUGF("SWITCH\n"); return SWITCH; }
+{CASE}      { DEBUGF("CASE\n"); return CASE; }
+{DEFAULT}   { DEBUGF("DEFAULT\n"); return DEFAULT; }
+{CONTINUE}  { DEBUGF("CONTINUE\n"); return CONTINUE; }
+{BREAK}     { DEBUGF("BREAK\n"); return BREAK; }
+{GOTO}      { DEBUGF("GOTO\n"); return GOTO; }
+{UNSIGNED}  { DEBUGF("UNSIGNED\n"); return UNSIGNED; }
+{TYPEDEF}   { DEBUGF("TYPEDEF\n"); return TYPEDEF; }
+{STRUCT}    { DEBUGF("STRUCT\n"); return STRUCT; }
+{UNION}     { DEBUGF("UNION\n"); return UNION; }
+{CONST}     { DEBUGF("CONST\n"); return CONST; }
+{STATIC}    { DEBUGF("STATIC\n"); return STATIC; }
+{EXTERN}    { DEBUGF("EXTERN\n"); return EXTERN; }
+{AUTO}      { DEBUGF("AUTO\n"); return AUTO; }
+{REGISTER}  { DEBUGF("REGISTER\n"); return REGISTER; }
+{SIZEOF}    { DEBUGF("SIZEOF\n"); return SIZEOF; }*/%}
 {INTVAL}    { DEBUGF("INTVAL\n"); return INTVAL; }
 {DBLVAL}    { DEBUGF("DBLVAL\n"); return DBLVAL; }
 {FLTVAL}    { DEBUGF("FLTVAL\n"); return FLTVAL; }
@@ -154,45 +186,19 @@ SIZEOF    "sizeof"
 {MUL}       { DEBUGF("MUL\n"); return MUL; }
 {DIV}       { DEBUGF("DIV\n"); return DIV; }
 {MOD}       { DEBUGF("MOD\n"); return MOD; }
-{OR}        { DEBUGF("OR\n"); return OR; }
-{AND}       { DEBUGF("AND\n"); return AND; }
 {BITOR}     { DEBUGF("BITOR\n"); return BITOR; }
 {BITAND}    { DEBUGF("BITAND\n"); return BITAND; }
+{BITXOR}    { DEBUGF("BITXOR\n"); return BITXOR; }
 {LSH}       { DEBUGF("LSH\n"); return LSH; }
 {RSH}       { DEBUGF("RSH\n"); return RSH; }
 {SET}       { DEBUGF("SET\n"); return SET; }
-{SETADD}    { DEBUGF("SETADD\n"); return SETADD; }
-{SETSUB}    { DEBUGF("SETSUB\n"); return SETSUB; }
-{SETMUL}    { DEBUGF("SETMUL\n"); return SETMUL; }
-{SETDIV}    { DEBUGF("SETDIV\n"); return SETDIV; }
-{SETMOD}    { DEBUGF("SETMOD\n"); return SETMOD; }
-{SETOR}     { DEBUGF("SETOR\n"); return SETOR; }
-{SETAND}    { DEBUGF("SETAND\n"); return SETAND; }
-{SETXOR}    { DEBUGF("SETXOR\n"); return SETXOR; }
-{SETLSH}    { DEBUGF("SETLSH\n"); return SETLSH; }
-{SETRSH}    { DEBUGF("SETRSH\n"); return SETRSH; }
 {RETURN}    { DEBUGF("RETURN\n"); return RETURN; }
-{DO}        { DEBUGF("DO\n"); return DO; }
+
 {WHILE}     { DEBUGF("WHILE\n"); return WHILE; }
-{FOR}       { DEBUGF("FOR\n"); return FOR; }
-{SWITCH}    { DEBUGF("SWITCH\n"); return SWITCH; }
-{CASE}      { DEBUGF("CASE\n"); return CASE; }
-{DEFAULT}   { DEBUGF("DEFAULT\n"); return DEFAULT; }
+
 {IF}        { DEBUGF("IF\n"); return IF; }
 {ELSE}      { DEBUGF("ELSE\n"); return ELSE; }
-{CONTINUE}  { DEBUGF("CONTINUE\n"); return CONTINUE; }
-{BREAK}     { DEBUGF("BREAK\n"); return BREAK; }
-{GOTO}      { DEBUGF("GOTO\n"); return GOTO; }
-{UNSIGNED}  { DEBUGF("UNSIGNED\n"); return UNSIGNED; }
-{TYPEDEF}   { DEBUGF("TYPEDEF\n"); return TYPEDEF; }
-{STRUCT}    { DEBUGF("STRUCT\n"); return STRUCT; }
-{UNION}     { DEBUGF("UNION\n"); return UNION; }
-{CONST}     { DEBUGF("CONST\n"); return CONST; }
-{STATIC}    { DEBUGF("STATIC\n"); return STATIC; }
-{EXTERN}    { DEBUGF("EXTERN\n"); return EXTERN; }
-{AUTO}      { DEBUGF("AUTO\n"); return AUTO; }
-{REGISTER}  { DEBUGF("REGISTER\n"); return REGISTER; }
-{SIZEOF}    { DEBUGF("SIZEOF\n"); return SIZEOF; }
+
 
 
 %{

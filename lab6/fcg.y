@@ -14,10 +14,48 @@ extern int yylex();
  ********************************************************/
 %union {
     char* id;
+    int intval;
+    double dblval;
+    float fltval;
+    char charval;
+    char* strval;
 }
 
 %token <id> ID
-%token INTVAL
+%token <intval> INTVAL
+%token <strval> STRVAL
+%token <charval> CHARVAL
+%token <dblval> DBLVAL
+%token <fltval> FLTVAL
+%token EQ
+%token NE
+%token GE
+%token LE
+%token GT
+%token LT
+%token ADD
+%token SUB
+%token MUL
+%token DIV
+%token MOD
+%token BITOR
+%token BITAND
+%token BITXOR
+%token LSH
+%token RSH
+%token SET
+%token RETURN
+%token IF
+%token ELSE
+%token WHILE
+%token VOID
+%token CHAR
+%token SHORT
+%token INT
+%token LONG
+%token FLOAT
+%token DOUBLE
+
 
 %start top
 
@@ -28,32 +66,86 @@ extern int yylex();
  * directive above.
  ********************************************************/
 top :
-|function top
-
+    |function top
+    ;
 
 /*This rule matches a  function in C Program*/
-function : func_signature '{' func_body '}'
+function : func_signature '{' func_body '}';
 
 /*This rule matches a function signature such as int main( int argc, char *argv[] )*/
 func_signature : type ID '(' args ')' { printf("%s", $2); printf(";\n"); lastFunction = $2;}
 
-/*********************************************************
- * An example rule used to parse arguments to a
- * function call. The arguments to a function call
- * can either be nothing, one parameter, or multiple
- * parameters separated by commas.
- ********************************************************/
+/*Rule to match function's body*/
+func_body : declaration
+          | statement
+          ;
+
+//Rule to define function call
+func_call : ID '(' args ')';
+
+/*Rule to define declaration*/
+declaration : type ID ';';
+            | type MUL ID
+            | type ID '[' INTVAL ']'
+            ;
+
+//Rule to define statement
+statement : ID SET expr ';'
+          | '{' stmnts '}'
+          | RETURN expr ';'
+          | func_call ';'
+          | IF '(' expr ')' statement ELSE statement
+          | IF '(' expr ')' statement
+          | WHILE '(' expr ')' statement
+          ;
+
 args : /* empty rule */
      | expr
      | expr ',' args
+     ;
 
-/*********************************************************
- * An example rule used to parse a single expression.
- * Currently this rule parses only an integer value
- * but you should modify the rule to parse the required
- * expressions.
- ********************************************************/
-expr : INTVAL
+stmnts  : statement
+        | statement stmnts
+        ;
+
+expr  : INTVAL
+      | STRVAL
+      | CHARVAL
+      | FLTVAL
+      | DBLVAL
+      | expr op expr
+      | func_call
+      | ID
+      | MUL ID
+      | ID '[' INTVAL ']'
+      ;
+
+type  : VOID
+      | CHAR
+      | SHORT
+      | INT
+      | LONG
+      | FLOAT
+      | DOUBLE
+      ;
+
+op    : EQ
+      | NE
+      | GT
+      | LT
+      | LE
+      | GE
+      | ADD
+      | SUB
+      | MUL
+      | DIV
+      | MOD
+      | LSH
+      | RSH
+      | BITAND
+      | BITOR
+      | BITXOR
+      ;
 
 %%
 
