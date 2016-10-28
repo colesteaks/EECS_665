@@ -95,14 +95,6 @@ SIZEOF    "sizeof"
   *************************************************************************/
 %}
 
-"("         { DEBUGF( "(\n" ); return '('; }
-")"         { DEBUGF( ")\n" ); return ')'; }
-"{"         { DEBUGF( "{\n" ); return '{'; }
-"}"         { DEBUGF( "}\n" ); return '}'; }
-"["         { DEBUGF( "[\n" ); return '['; }
-"]"         { DEBUGF( "]\n" ); return ']'; }
-","         { DEBUGF( ",\n" ); return ','; }
-";"         { DEBUGF( ";\n" ); return ';'; }
 
 %{
  /**************************************************************************
@@ -110,7 +102,7 @@ SIZEOF    "sizeof"
   *************************************************************************/
 %}
 
-{ID}        { DEBUGF("ID\n") return ID; }
+
 
 %{
  /**************************************************************************
@@ -132,7 +124,7 @@ SIZEOF    "sizeof"
   *************************************************************************/
 %}
 
-%{/*{PREPROC}   { DEBUGF("PREPROC\n"); return PREPROC; }
+{PREPROC}   { DEBUGF("PREPROC\n"); return PREPROC; }
 {OR}        { DEBUGF("OR\n"); return OR; }
 {AND}       { DEBUGF("AND\n"); return AND; }
 {SETADD}    { DEBUGF("SETADD\n"); return SETADD; }
@@ -162,7 +154,8 @@ SIZEOF    "sizeof"
 {EXTERN}    { DEBUGF("EXTERN\n"); return EXTERN; }
 {AUTO}      { DEBUGF("AUTO\n"); return AUTO; }
 {REGISTER}  { DEBUGF("REGISTER\n"); return REGISTER; }
-{SIZEOF}    { DEBUGF("SIZEOF\n"); return SIZEOF; }*/%}
+{SIZEOF}    { DEBUGF("SIZEOF\n"); return SIZEOF; }
+
 {INTVAL}    { DEBUGF("INTVAL\n"); return INTVAL; }
 {DBLVAL}    { DEBUGF("DBLVAL\n"); return DBLVAL; }
 {FLTVAL}    { DEBUGF("FLTVAL\n"); return FLTVAL; }
@@ -175,6 +168,7 @@ SIZEOF    "sizeof"
 {CHAR}      { DEBUGF("CHAR\n"); return CHAR; }
 {INT}       { DEBUGF("INT\n"); return INT; }
 {FLOAT}     { DEBUGF("FLOAT\n"); return FLOAT; }
+
 {EQ}        { DEBUGF("EQ\n"); return EQ; }
 {NE}        { DEBUGF("NE\n"); return NE; }
 {GE}        { DEBUGF("GE\n"); return GE; }
@@ -199,7 +193,17 @@ SIZEOF    "sizeof"
 {IF}        { DEBUGF("IF\n"); return IF; }
 {ELSE}      { DEBUGF("ELSE\n"); return ELSE; }
 
+{ID}        { DEBUGF("ID\n"); yylval.id = strdup(yytext); return ID; }
 
+
+"("         { DEBUGF( "(\n" ); return '('; }
+")"         { DEBUGF( ")\n" ); return ')'; }
+"{"         { DEBUGF( "{\n" ); return '{'; }
+"}"         { DEBUGF( "}\n" ); return '}'; }
+"["         { DEBUGF( "[\n" ); return '['; }
+"]"         { DEBUGF( "]\n" ); return ']'; }
+","         { DEBUGF( ",\n" ); return ','; }
+";"         { DEBUGF( ";\n" ); return ';'; }
 
 %{
  /**************************************************************************
@@ -218,11 +222,4 @@ SIZEOF    "sizeof"
 . {
     fprintf( stderr, "Unexpected input at line %d: '%s'\n", yylineno, yytext );
     exit( 1 );
-}
-
-%%
-int main(int argc, const char* argv[])
-{
-  while(yylex()){};
-  return 0;
 }

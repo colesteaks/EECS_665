@@ -55,6 +55,38 @@ extern int yylex();
 %token LONG
 %token FLOAT
 %token DOUBLE
+%token PREPROC
+%token OR
+%token AND
+%token SETADD
+%token SETSUB
+%token SETMUL
+%token SETDIV
+%token SETMOD
+%token SETOR
+%token SETAND
+%token SETXOR
+%token SETLSH
+%token SETRSH
+%token DO
+%token FOR
+%token SWITCH
+%token CASE
+%token DEFAULT
+%token CONTINUE
+%token BREAK
+%token GOTO
+%token UNSIGNED
+%token TYPEDEF
+%token STRUCT
+%token UNION
+%token CONST
+%token STATIC
+%token EXTERN
+%token AUTO
+%token REGISTER
+%token SIZEOF
+
 
 
 %start top
@@ -70,18 +102,19 @@ top :
     ;
 
 /*This rule matches a  function in C Program*/
-function : func_signature '{' func_body '}';
+function : func_signature '{' func_body '}'
 
 /*This rule matches a function signature such as int main( int argc, char *argv[] )*/
 func_signature : type ID '(' args ')' { printf("%s", $2); printf(";\n"); lastFunction = $2;}
 
 /*Rule to match function's body*/
-func_body : declaration
-          | statement
+func_body :
+          | declaration func_body
+          | statement func_body
           ;
 
 //Rule to define function call
-func_call : ID '(' args ')';
+func_call : ID '(' exprs ')' { printf("%s", lastFunction); printf(" -> "); printf("%s",$1); printf(";\n"); }
 
 /*Rule to define declaration*/
 declaration : type ID ';';
@@ -91,6 +124,7 @@ declaration : type ID ';';
 
 //Rule to define statement
 statement : ID SET expr ';'
+          | ID '['INTVAL']' SET expr ';'
           | '{' stmnts '}'
           | RETURN expr ';'
           | func_call ';'
@@ -100,12 +134,19 @@ statement : ID SET expr ';'
           ;
 
 args : /* empty rule */
-     | expr
-     | expr ',' args
+     | parameter
+     | parameter ',' args
      ;
 
+parameter : type ID
+          | type MUL ID
+          | type ID '['']'
+          | type MUL ID '['']'
+          | type ID '['expr']'
+          | type MUL ID '['expr']'
+          ;
 stmnts  : statement
-        | statement stmnts
+        | statement ',' stmnts
         ;
 
 expr  : INTVAL
@@ -119,6 +160,10 @@ expr  : INTVAL
       | MUL ID
       | ID '[' INTVAL ']'
       ;
+
+exprs :
+      | expr
+      | expr ',' exprs
 
 type  : VOID
       | CHAR
@@ -142,9 +187,22 @@ op    : EQ
       | MOD
       | LSH
       | RSH
+      | OR
+      | AND
       | BITAND
       | BITOR
       | BITXOR
+      | SET
+      | SETADD
+      | SETSUB
+      | SETMUL
+      | SETDIV
+      | SETMOD
+      | SETOR
+      | SETAND
+      | SETXOR
+      | SETLSH
+      | SETRSH
       ;
 
 %%
