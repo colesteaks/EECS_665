@@ -49,7 +49,7 @@ externs :			{}
         | externs extern	{}
         ;
 
-extern  : dcl ';'		{}				
+extern  : dcl ';'		{}
         | func			{}
         ;
 
@@ -212,7 +212,7 @@ lval	: ID			{ $$ = id($1); }
 
 extern int lineno;
 
-/* 
+/*
  * main - read a program, and parse it
  */
 main(int argc, char *argv)
@@ -223,7 +223,6 @@ main(int argc, char *argv)
    enterblock();
    if (yyparse())
       yyerror("syntax error");
-   leaveblock();
    leaveblock();
    exit(0);
 }

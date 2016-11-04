@@ -32,7 +32,19 @@ struct id_entry *id_table[ITABSIZE] = {0}; /* identifier hash table */
  */
 void dump(int blev, FILE *f)
 {
-   fprintf( f, "You must write the function 'dump' yourself\n" );
+    //fprintf(f, "Dumping \tidentifier \ttable\n");
+    printf("Dumping \tidentifier \ttable\n");
+    for(int i = 0; i < ITABSIZE; i++) {
+        struct id_entry **q;
+        q = &id_table[i];
+        if(*q) {
+            if((*q)->i_blevel >= blev)
+                //fprintf(f, "%s\t%s\n", q->i_name, q->i_blevel);
+                printf("%s\t%d\n", (*q)->i_name, (*q)->i_blevel);
+                id_table[i] = NULL;
+        }
+    }
+   //print correct line, remove item from hash table with requisite block level
 }
 
 /*
@@ -61,7 +73,7 @@ void exit_block()
  */
 void enterblock()
 {
-   
+   level += 1;
 }
 
 /*
@@ -95,8 +107,10 @@ struct id_entry *install(char *name, int blev)
  */
 void leaveblock()
 {
-   fprintf( stderr, "You must write the function 'leaveblock' yourself\n" );
-   exit( 1 );
+    FILE *f = fopen("result.output", "w");
+    dump(level, f);
+    level -= 1;
+   //decrement level and call dump
 }
 
 /*

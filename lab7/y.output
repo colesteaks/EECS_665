@@ -1,0 +1,3138 @@
+Terminals which are not used
+
+   RESERVED
+
+
+State 181 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: prog $end
+
+    1 prog: externs
+
+    2 externs: /* empty */
+    3        | externs extern
+
+    4 extern: dcl ';'
+    5       | func
+
+    6 dcls: /* empty */
+    7     | dcls dcl ';'
+
+    8 dcl: type dclr
+    9    | dcl ',' dclr
+
+   10 dclr: ID
+   11     | ID '[' ']'
+   12     | ID '[' CON ']'
+
+   13 type: CHAR
+   14     | FLOAT
+   15     | DOUBLE
+   16     | INT
+
+   17 func: fhead stmts '}'
+
+   18 fhead: fname fargs '{' dcls
+
+   19 fname: type ID
+   20      | ID
+
+   21 fargs: '(' ')'
+   22      | '(' args ')'
+
+   23 args: type dclr
+   24     | args ',' type dclr
+
+   25 bhead: '{'
+
+   26 block: bhead dcls stmts '}'
+
+   27 stmts: /* empty */
+   28      | stmts lblstmt
+
+   29 lblstmt: b stmt
+   30        | b labels stmt
+
+   31 labels: ID ':'
+   32       | labels ID ':'
+
+   33 s: /* empty */
+
+   34 m: /* empty */
+
+   35 n: /* empty */
+
+   36 b: /* empty */
+
+   37 stmt: expr ';'
+   38     | IF '(' cexpr ')' m lblstmt m
+   39     | IF '(' cexpr ')' m lblstmt ELSE n m lblstmt m
+   40     | WHILE '(' m cexpr ')' m s lblstmt n m
+   41     | DO m s lblstmt WHILE '(' m cexpr ')' ';' m
+   42     | FOR '(' expro ';' m cexpro ';' m expro n ')' m s lblstmt n m
+   43     | CONTINUE ';'
+   44     | BREAK ';'
+   45     | GOTO ID ';'
+   46     | RETURN ';'
+   47     | RETURN expr ';'
+   48     | block
+   49     | ';'
+
+   50 cexpro: /* empty */
+   51       | cexpr
+
+   52 cexpr: expr EQ expr
+   53      | expr NE expr
+   54      | expr LE expr
+   55      | expr GE expr
+   56      | expr LT expr
+   57      | expr GT expr
+   58      | cexpr AND m cexpr
+   59      | cexpr OR m cexpr
+   60      | NOT cexpr
+   61      | expr
+
+   62 exprs: expr
+   63      | exprs ',' expr
+
+   64 expro: /* empty */
+   65      | expr
+
+   66 expr: lval SET expr
+   67     | lval SETOR expr
+   68     | lval SETXOR expr
+   69     | lval SETAND expr
+   70     | lval SETLSH expr
+   71     | lval SETRSH expr
+   72     | lval SETADD expr
+   73     | lval SETSUB expr
+   74     | lval SETMUL expr
+   75     | lval SETDIV expr
+   76     | lval SETMOD expr
+   77     | expr BITOR expr
+   78     | expr BITXOR expr
+   79     | expr BITAND expr
+   80     | expr LSH expr
+   81     | expr RSH expr
+   82     | expr ADD expr
+   83     | expr SUB expr
+   84     | expr MUL expr
+   85     | expr DIV expr
+   86     | expr MOD expr
+   87     | BITAND lval
+   88     | SUB expr
+   89     | COM expr
+   90     | lval
+   91     | ID '(' ')'
+   92     | ID '(' exprs ')'
+   93     | '(' expr ')'
+   94     | CON
+   95     | STR
+
+   96 lval: ID
+   97     | ID '[' expr ']'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'(' (40) 21 22 38 39 40 41 42 91 92 93
+')' (41) 21 22 38 39 40 41 42 91 92 93
+',' (44) 9 24 63
+':' (58) 31 32
+';' (59) 4 7 37 41 42 43 44 45 46 47 49
+'[' (91) 11 12 97
+']' (93) 11 12 97
+'{' (123) 18 25
+'}' (125) 17 26
+error (256)
+ID (258) 10 11 12 19 20 31 32 45 91 92 96 97
+CON (259) 12 94
+STR (260) 95
+CHAR (261) 13
+ELSE (262) 39
+FLOAT (263) 14
+DOUBLE (264) 15
+FOR (265) 42
+IF (266) 38 39
+INT (267) 16
+RESERVED (268)
+RETURN (269) 46 47
+WHILE (270) 40 41
+DO (271) 41
+CONTINUE (272) 43
+BREAK (273) 44
+GOTO (274) 45
+LVAL (275)
+SETMOD (276) 76
+SETDIV (277) 75
+SETMUL (278) 74
+SETSUB (279) 73
+SETADD (280) 72
+SETRSH (281) 71
+SETLSH (282) 70
+SETAND (283) 69
+SETXOR (284) 68
+SETOR (285) 67
+SET (286) 66
+OR (287) 59
+AND (288) 58
+BITOR (289) 77
+BITXOR (290) 78
+BITAND (291) 79 87
+NE (292) 53
+EQ (293) 52
+LE (294) 54
+LT (295) 56
+GE (296) 55
+GT (297) 57
+RSH (298) 81
+LSH (299) 80
+SUB (300) 83 88
+ADD (301) 82
+MOD (302) 86
+DIV (303) 85
+MUL (304) 84
+COM (305) 89
+NOT (306) 60
+UNARY (307)
+
+
+Nonterminals, with rules where they appear
+
+$accept (62)
+    on left: 0
+prog (63)
+    on left: 1, on right: 0
+externs (64)
+    on left: 2 3, on right: 1 3
+extern (65)
+    on left: 4 5, on right: 3
+dcls (66)
+    on left: 6 7, on right: 7 18 26
+dcl (67)
+    on left: 8 9, on right: 4 7 9
+dclr (68)
+    on left: 10 11 12, on right: 8 9 23 24
+type (69)
+    on left: 13 14 15 16, on right: 8 19 23 24
+func (70)
+    on left: 17, on right: 5
+fhead (71)
+    on left: 18, on right: 17
+fname (72)
+    on left: 19 20, on right: 18
+fargs (73)
+    on left: 21 22, on right: 18
+args (74)
+    on left: 23 24, on right: 22 24
+bhead (75)
+    on left: 25, on right: 26
+block (76)
+    on left: 26, on right: 48
+stmts (77)
+    on left: 27 28, on right: 17 26 28
+lblstmt (78)
+    on left: 29 30, on right: 28 38 39 40 41 42
+labels (79)
+    on left: 31 32, on right: 30 32
+s (80)
+    on left: 33, on right: 40 41 42
+m (81)
+    on left: 34, on right: 38 39 40 41 42 58 59
+n (82)
+    on left: 35, on right: 39 40 42
+b (83)
+    on left: 36, on right: 29 30
+stmt (84)
+    on left: 37 38 39 40 41 42 43 44 45 46 47 48 49,
+    on right: 29 30
+cexpro (85)
+    on left: 50 51, on right: 42
+cexpr (86)
+    on left: 52 53 54 55 56 57 58 59 60 61, on right: 38 39 40 41 51
+    58 59 60
+exprs (87)
+    on left: 62 63, on right: 63 92
+expro (88)
+    on left: 64 65, on right: 42
+expr (89)
+    on left: 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83
+    84 85 86 87 88 89 90 91 92 93 94 95, on right: 37 47 52 53 54 55
+    56 57 61 62 63 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
+    81 82 83 84 85 86 88 89 93 97
+lval (90)
+    on left: 96 97, on right: 66 67 68 69 70 71 72 73 74 75 76 87 90
+
+
+state 0
+
+    0 $accept: . prog $end
+
+    $default  reduce using rule 2 (externs)
+
+    prog     go to state 1
+    externs  go to state 2
+
+
+state 1
+
+    0 $accept: prog . $end
+
+    $end  shift, and go to state 3
+
+
+state 2
+
+    1 prog: externs .
+    3 externs: externs . extern
+
+    ID      shift, and go to state 4
+    CHAR    shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    DOUBLE  shift, and go to state 7
+    INT     shift, and go to state 8
+
+    $default  reduce using rule 1 (prog)
+
+    extern  go to state 9
+    dcl     go to state 10
+    type    go to state 11
+    func    go to state 12
+    fhead   go to state 13
+    fname   go to state 14
+
+
+state 3
+
+    0 $accept: prog $end .
+
+    $default  accept
+
+
+state 4
+
+   20 fname: ID .
+
+    $default  reduce using rule 20 (fname)
+
+
+state 5
+
+   13 type: CHAR .
+
+    $default  reduce using rule 13 (type)
+
+
+state 6
+
+   14 type: FLOAT .
+
+    $default  reduce using rule 14 (type)
+
+
+state 7
+
+   15 type: DOUBLE .
+
+    $default  reduce using rule 15 (type)
+
+
+state 8
+
+   16 type: INT .
+
+    $default  reduce using rule 16 (type)
+
+
+state 9
+
+    3 externs: externs extern .
+
+    $default  reduce using rule 3 (externs)
+
+
+state 10
+
+    4 extern: dcl . ';'
+    9 dcl: dcl . ',' dclr
+
+    ';'  shift, and go to state 15
+    ','  shift, and go to state 16
+
+
+state 11
+
+    8 dcl: type . dclr
+   19 fname: type . ID
+
+    ID  shift, and go to state 17
+
+    dclr  go to state 18
+
+
+state 12
+
+    5 extern: func .
+
+    $default  reduce using rule 5 (extern)
+
+
+state 13
+
+   17 func: fhead . stmts '}'
+
+    $default  reduce using rule 27 (stmts)
+
+    stmts  go to state 19
+
+
+state 14
+
+   18 fhead: fname . fargs '{' dcls
+
+    '('  shift, and go to state 20
+
+    fargs  go to state 21
+
+
+state 15
+
+    4 extern: dcl ';' .
+
+    $default  reduce using rule 4 (extern)
+
+
+state 16
+
+    9 dcl: dcl ',' . dclr
+
+    ID  shift, and go to state 22
+
+    dclr  go to state 23
+
+
+state 17
+
+   10 dclr: ID .
+   11     | ID . '[' ']'
+   12     | ID . '[' CON ']'
+   19 fname: type ID .
+
+    '['  shift, and go to state 24
+
+    '('       reduce using rule 19 (fname)
+    $default  reduce using rule 10 (dclr)
+
+
+state 18
+
+    8 dcl: type dclr .
+
+    $default  reduce using rule 8 (dcl)
+
+
+state 19
+
+   17 func: fhead stmts . '}'
+   28 stmts: stmts . lblstmt
+
+    '}'  shift, and go to state 25
+
+    $default  reduce using rule 36 (b)
+
+    lblstmt  go to state 26
+    b        go to state 27
+
+
+state 20
+
+   21 fargs: '(' . ')'
+   22      | '(' . args ')'
+
+    CHAR    shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    DOUBLE  shift, and go to state 7
+    INT     shift, and go to state 8
+    ')'     shift, and go to state 28
+
+    type  go to state 29
+    args  go to state 30
+
+
+state 21
+
+   18 fhead: fname fargs . '{' dcls
+
+    '{'  shift, and go to state 31
+
+
+state 22
+
+   10 dclr: ID .
+   11     | ID . '[' ']'
+   12     | ID . '[' CON ']'
+
+    '['  shift, and go to state 24
+
+    $default  reduce using rule 10 (dclr)
+
+
+state 23
+
+    9 dcl: dcl ',' dclr .
+
+    $default  reduce using rule 9 (dcl)
+
+
+state 24
+
+   11 dclr: ID '[' . ']'
+   12     | ID '[' . CON ']'
+
+    CON  shift, and go to state 32
+    ']'  shift, and go to state 33
+
+
+state 25
+
+   17 func: fhead stmts '}' .
+
+    $default  reduce using rule 17 (func)
+
+
+state 26
+
+   28 stmts: stmts lblstmt .
+
+    $default  reduce using rule 28 (stmts)
+
+
+state 27
+
+   29 lblstmt: b . stmt
+   30        | b . labels stmt
+
+    ID        shift, and go to state 34
+    CON       shift, and go to state 35
+    STR       shift, and go to state 36
+    FOR       shift, and go to state 37
+    IF        shift, and go to state 38
+    RETURN    shift, and go to state 39
+    WHILE     shift, and go to state 40
+    DO        shift, and go to state 41
+    CONTINUE  shift, and go to state 42
+    BREAK     shift, and go to state 43
+    GOTO      shift, and go to state 44
+    BITAND    shift, and go to state 45
+    SUB       shift, and go to state 46
+    COM       shift, and go to state 47
+    ';'       shift, and go to state 48
+    '{'       shift, and go to state 49
+    '('       shift, and go to state 50
+
+    bhead   go to state 51
+    block   go to state 52
+    labels  go to state 53
+    stmt    go to state 54
+    expr    go to state 55
+    lval    go to state 56
+
+
+state 28
+
+   21 fargs: '(' ')' .
+
+    $default  reduce using rule 21 (fargs)
+
+
+state 29
+
+   23 args: type . dclr
+
+    ID  shift, and go to state 22
+
+    dclr  go to state 57
+
+
+state 30
+
+   22 fargs: '(' args . ')'
+   24 args: args . ',' type dclr
+
+    ','  shift, and go to state 58
+    ')'  shift, and go to state 59
+
+
+state 31
+
+   18 fhead: fname fargs '{' . dcls
+
+    $default  reduce using rule 6 (dcls)
+
+    dcls  go to state 60
+
+
+state 32
+
+   12 dclr: ID '[' CON . ']'
+
+    ']'  shift, and go to state 61
+
+
+state 33
+
+   11 dclr: ID '[' ']' .
+
+    $default  reduce using rule 11 (dclr)
+
+
+state 34
+
+   31 labels: ID . ':'
+   91 expr: ID . '(' ')'
+   92     | ID . '(' exprs ')'
+   96 lval: ID .
+   97     | ID . '[' expr ']'
+
+    '['  shift, and go to state 62
+    '('  shift, and go to state 63
+    ':'  shift, and go to state 64
+
+    $default  reduce using rule 96 (lval)
+
+
+state 35
+
+   94 expr: CON .
+
+    $default  reduce using rule 94 (expr)
+
+
+state 36
+
+   95 expr: STR .
+
+    $default  reduce using rule 95 (expr)
+
+
+state 37
+
+   42 stmt: FOR . '(' expro ';' m cexpro ';' m expro n ')' m s lblstmt n m
+
+    '('  shift, and go to state 65
+
+
+state 38
+
+   38 stmt: IF . '(' cexpr ')' m lblstmt m
+   39     | IF . '(' cexpr ')' m lblstmt ELSE n m lblstmt m
+
+    '('  shift, and go to state 66
+
+
+state 39
+
+   46 stmt: RETURN . ';'
+   47     | RETURN . expr ';'
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    ';'     shift, and go to state 68
+    '('     shift, and go to state 50
+
+    expr  go to state 69
+    lval  go to state 56
+
+
+state 40
+
+   40 stmt: WHILE . '(' m cexpr ')' m s lblstmt n m
+
+    '('  shift, and go to state 70
+
+
+state 41
+
+   41 stmt: DO . m s lblstmt WHILE '(' m cexpr ')' ';' m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 71
+
+
+state 42
+
+   43 stmt: CONTINUE . ';'
+
+    ';'  shift, and go to state 72
+
+
+state 43
+
+   44 stmt: BREAK . ';'
+
+    ';'  shift, and go to state 73
+
+
+state 44
+
+   45 stmt: GOTO . ID ';'
+
+    ID  shift, and go to state 74
+
+
+state 45
+
+   87 expr: BITAND . lval
+
+    ID  shift, and go to state 75
+
+    lval  go to state 76
+
+
+state 46
+
+   88 expr: SUB . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 77
+    lval  go to state 56
+
+
+state 47
+
+   89 expr: COM . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 78
+    lval  go to state 56
+
+
+state 48
+
+   49 stmt: ';' .
+
+    $default  reduce using rule 49 (stmt)
+
+
+state 49
+
+   25 bhead: '{' .
+
+    $default  reduce using rule 25 (bhead)
+
+
+state 50
+
+   93 expr: '(' . expr ')'
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 79
+    lval  go to state 56
+
+
+state 51
+
+   26 block: bhead . dcls stmts '}'
+
+    $default  reduce using rule 6 (dcls)
+
+    dcls  go to state 80
+
+
+state 52
+
+   48 stmt: block .
+
+    $default  reduce using rule 48 (stmt)
+
+
+state 53
+
+   30 lblstmt: b labels . stmt
+   32 labels: labels . ID ':'
+
+    ID        shift, and go to state 81
+    CON       shift, and go to state 35
+    STR       shift, and go to state 36
+    FOR       shift, and go to state 37
+    IF        shift, and go to state 38
+    RETURN    shift, and go to state 39
+    WHILE     shift, and go to state 40
+    DO        shift, and go to state 41
+    CONTINUE  shift, and go to state 42
+    BREAK     shift, and go to state 43
+    GOTO      shift, and go to state 44
+    BITAND    shift, and go to state 45
+    SUB       shift, and go to state 46
+    COM       shift, and go to state 47
+    ';'       shift, and go to state 48
+    '{'       shift, and go to state 49
+    '('       shift, and go to state 50
+
+    bhead  go to state 51
+    block  go to state 52
+    stmt   go to state 82
+    expr   go to state 55
+    lval   go to state 56
+
+
+state 54
+
+   29 lblstmt: b stmt .
+
+    $default  reduce using rule 29 (lblstmt)
+
+
+state 55
+
+   37 stmt: expr . ';'
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+    ';'     shift, and go to state 93
+
+
+state 56
+
+   66 expr: lval . SET expr
+   67     | lval . SETOR expr
+   68     | lval . SETXOR expr
+   69     | lval . SETAND expr
+   70     | lval . SETLSH expr
+   71     | lval . SETRSH expr
+   72     | lval . SETADD expr
+   73     | lval . SETSUB expr
+   74     | lval . SETMUL expr
+   75     | lval . SETDIV expr
+   76     | lval . SETMOD expr
+   90     | lval .
+
+    SETMOD  shift, and go to state 94
+    SETDIV  shift, and go to state 95
+    SETMUL  shift, and go to state 96
+    SETSUB  shift, and go to state 97
+    SETADD  shift, and go to state 98
+    SETRSH  shift, and go to state 99
+    SETLSH  shift, and go to state 100
+    SETAND  shift, and go to state 101
+    SETXOR  shift, and go to state 102
+    SETOR   shift, and go to state 103
+    SET     shift, and go to state 104
+
+    $default  reduce using rule 90 (expr)
+
+
+state 57
+
+   23 args: type dclr .
+
+    $default  reduce using rule 23 (args)
+
+
+state 58
+
+   24 args: args ',' . type dclr
+
+    CHAR    shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    DOUBLE  shift, and go to state 7
+    INT     shift, and go to state 8
+
+    type  go to state 105
+
+
+state 59
+
+   22 fargs: '(' args ')' .
+
+    $default  reduce using rule 22 (fargs)
+
+
+state 60
+
+    7 dcls: dcls . dcl ';'
+   18 fhead: fname fargs '{' dcls .
+
+    CHAR    shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    DOUBLE  shift, and go to state 7
+    INT     shift, and go to state 8
+
+    $default  reduce using rule 18 (fhead)
+
+    dcl   go to state 106
+    type  go to state 107
+
+
+state 61
+
+   12 dclr: ID '[' CON ']' .
+
+    $default  reduce using rule 12 (dclr)
+
+
+state 62
+
+   97 lval: ID '[' . expr ']'
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 108
+    lval  go to state 56
+
+
+state 63
+
+   91 expr: ID '(' . ')'
+   92     | ID '(' . exprs ')'
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+    ')'     shift, and go to state 109
+
+    exprs  go to state 110
+    expr   go to state 111
+    lval   go to state 56
+
+
+state 64
+
+   31 labels: ID ':' .
+
+    $default  reduce using rule 31 (labels)
+
+
+state 65
+
+   42 stmt: FOR '(' . expro ';' m cexpro ';' m expro n ')' m s lblstmt n m
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    $default  reduce using rule 64 (expro)
+
+    expro  go to state 112
+    expr   go to state 113
+    lval   go to state 56
+
+
+state 66
+
+   38 stmt: IF '(' . cexpr ')' m lblstmt m
+   39     | IF '(' . cexpr ')' m lblstmt ELSE n m lblstmt m
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    NOT     shift, and go to state 114
+    '('     shift, and go to state 50
+
+    cexpr  go to state 115
+    expr   go to state 116
+    lval   go to state 56
+
+
+state 67
+
+   91 expr: ID . '(' ')'
+   92     | ID . '(' exprs ')'
+   96 lval: ID .
+   97     | ID . '[' expr ']'
+
+    '['  shift, and go to state 62
+    '('  shift, and go to state 63
+
+    $default  reduce using rule 96 (lval)
+
+
+state 68
+
+   46 stmt: RETURN ';' .
+
+    $default  reduce using rule 46 (stmt)
+
+
+state 69
+
+   47 stmt: RETURN expr . ';'
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+    ';'     shift, and go to state 117
+
+
+state 70
+
+   40 stmt: WHILE '(' . m cexpr ')' m s lblstmt n m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 118
+
+
+state 71
+
+   41 stmt: DO m . s lblstmt WHILE '(' m cexpr ')' ';' m
+
+    $default  reduce using rule 33 (s)
+
+    s  go to state 119
+
+
+state 72
+
+   43 stmt: CONTINUE ';' .
+
+    $default  reduce using rule 43 (stmt)
+
+
+state 73
+
+   44 stmt: BREAK ';' .
+
+    $default  reduce using rule 44 (stmt)
+
+
+state 74
+
+   45 stmt: GOTO ID . ';'
+
+    ';'  shift, and go to state 120
+
+
+state 75
+
+   96 lval: ID .
+   97     | ID . '[' expr ']'
+
+    '['  shift, and go to state 62
+
+    $default  reduce using rule 96 (lval)
+
+
+state 76
+
+   87 expr: BITAND lval .
+
+    $default  reduce using rule 87 (expr)
+
+
+state 77
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+   88     | SUB expr .
+
+    $default  reduce using rule 88 (expr)
+
+
+state 78
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+   89     | COM expr .
+
+    $default  reduce using rule 89 (expr)
+
+
+state 79
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+   93     | '(' expr . ')'
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+    ')'     shift, and go to state 121
+
+
+state 80
+
+    7 dcls: dcls . dcl ';'
+   26 block: bhead dcls . stmts '}'
+
+    CHAR    shift, and go to state 5
+    FLOAT   shift, and go to state 6
+    DOUBLE  shift, and go to state 7
+    INT     shift, and go to state 8
+
+    $default  reduce using rule 27 (stmts)
+
+    dcl    go to state 106
+    type   go to state 107
+    stmts  go to state 122
+
+
+state 81
+
+   32 labels: labels ID . ':'
+   91 expr: ID . '(' ')'
+   92     | ID . '(' exprs ')'
+   96 lval: ID .
+   97     | ID . '[' expr ']'
+
+    '['  shift, and go to state 62
+    '('  shift, and go to state 63
+    ':'  shift, and go to state 123
+
+    $default  reduce using rule 96 (lval)
+
+
+state 82
+
+   30 lblstmt: b labels stmt .
+
+    $default  reduce using rule 30 (lblstmt)
+
+
+state 83
+
+   77 expr: expr BITOR . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 124
+    lval  go to state 56
+
+
+state 84
+
+   78 expr: expr BITXOR . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 125
+    lval  go to state 56
+
+
+state 85
+
+   79 expr: expr BITAND . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 126
+    lval  go to state 56
+
+
+state 86
+
+   81 expr: expr RSH . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 127
+    lval  go to state 56
+
+
+state 87
+
+   80 expr: expr LSH . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 128
+    lval  go to state 56
+
+
+state 88
+
+   83 expr: expr SUB . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 129
+    lval  go to state 56
+
+
+state 89
+
+   82 expr: expr ADD . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 130
+    lval  go to state 56
+
+
+state 90
+
+   86 expr: expr MOD . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 131
+    lval  go to state 56
+
+
+state 91
+
+   85 expr: expr DIV . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 132
+    lval  go to state 56
+
+
+state 92
+
+   84 expr: expr MUL . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 133
+    lval  go to state 56
+
+
+state 93
+
+   37 stmt: expr ';' .
+
+    $default  reduce using rule 37 (stmt)
+
+
+state 94
+
+   76 expr: lval SETMOD . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 134
+    lval  go to state 56
+
+
+state 95
+
+   75 expr: lval SETDIV . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 135
+    lval  go to state 56
+
+
+state 96
+
+   74 expr: lval SETMUL . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 136
+    lval  go to state 56
+
+
+state 97
+
+   73 expr: lval SETSUB . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 137
+    lval  go to state 56
+
+
+state 98
+
+   72 expr: lval SETADD . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 138
+    lval  go to state 56
+
+
+state 99
+
+   71 expr: lval SETRSH . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 139
+    lval  go to state 56
+
+
+state 100
+
+   70 expr: lval SETLSH . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 140
+    lval  go to state 56
+
+
+state 101
+
+   69 expr: lval SETAND . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 141
+    lval  go to state 56
+
+
+state 102
+
+   68 expr: lval SETXOR . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 142
+    lval  go to state 56
+
+
+state 103
+
+   67 expr: lval SETOR . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 143
+    lval  go to state 56
+
+
+state 104
+
+   66 expr: lval SET . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 144
+    lval  go to state 56
+
+
+state 105
+
+   24 args: args ',' type . dclr
+
+    ID  shift, and go to state 22
+
+    dclr  go to state 145
+
+
+state 106
+
+    7 dcls: dcls dcl . ';'
+    9 dcl: dcl . ',' dclr
+
+    ';'  shift, and go to state 146
+    ','  shift, and go to state 16
+
+
+state 107
+
+    8 dcl: type . dclr
+
+    ID  shift, and go to state 22
+
+    dclr  go to state 18
+
+
+state 108
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+   97 lval: ID '[' expr . ']'
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+    ']'     shift, and go to state 147
+
+
+state 109
+
+   91 expr: ID '(' ')' .
+
+    $default  reduce using rule 91 (expr)
+
+
+state 110
+
+   63 exprs: exprs . ',' expr
+   92 expr: ID '(' exprs . ')'
+
+    ','  shift, and go to state 148
+    ')'  shift, and go to state 149
+
+
+state 111
+
+   62 exprs: expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 62 (exprs)
+
+
+state 112
+
+   42 stmt: FOR '(' expro . ';' m cexpro ';' m expro n ')' m s lblstmt n m
+
+    ';'  shift, and go to state 150
+
+
+state 113
+
+   65 expro: expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 65 (expro)
+
+
+state 114
+
+   60 cexpr: NOT . cexpr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    NOT     shift, and go to state 114
+    '('     shift, and go to state 50
+
+    cexpr  go to state 151
+    expr   go to state 116
+    lval   go to state 56
+
+
+state 115
+
+   38 stmt: IF '(' cexpr . ')' m lblstmt m
+   39     | IF '(' cexpr . ')' m lblstmt ELSE n m lblstmt m
+   58 cexpr: cexpr . AND m cexpr
+   59      | cexpr . OR m cexpr
+
+    OR   shift, and go to state 152
+    AND  shift, and go to state 153
+    ')'  shift, and go to state 154
+
+
+state 116
+
+   52 cexpr: expr . EQ expr
+   53      | expr . NE expr
+   54      | expr . LE expr
+   55      | expr . GE expr
+   56      | expr . LT expr
+   57      | expr . GT expr
+   61      | expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    NE      shift, and go to state 155
+    EQ      shift, and go to state 156
+    LE      shift, and go to state 157
+    LT      shift, and go to state 158
+    GE      shift, and go to state 159
+    GT      shift, and go to state 160
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 61 (cexpr)
+
+
+state 117
+
+   47 stmt: RETURN expr ';' .
+
+    $default  reduce using rule 47 (stmt)
+
+
+state 118
+
+   40 stmt: WHILE '(' m . cexpr ')' m s lblstmt n m
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    NOT     shift, and go to state 114
+    '('     shift, and go to state 50
+
+    cexpr  go to state 161
+    expr   go to state 116
+    lval   go to state 56
+
+
+state 119
+
+   41 stmt: DO m s . lblstmt WHILE '(' m cexpr ')' ';' m
+
+    $default  reduce using rule 36 (b)
+
+    lblstmt  go to state 162
+    b        go to state 27
+
+
+state 120
+
+   45 stmt: GOTO ID ';' .
+
+    $default  reduce using rule 45 (stmt)
+
+
+state 121
+
+   93 expr: '(' expr ')' .
+
+    $default  reduce using rule 93 (expr)
+
+
+state 122
+
+   26 block: bhead dcls stmts . '}'
+   28 stmts: stmts . lblstmt
+
+    '}'  shift, and go to state 163
+
+    $default  reduce using rule 36 (b)
+
+    lblstmt  go to state 26
+    b        go to state 27
+
+
+state 123
+
+   32 labels: labels ID ':' .
+
+    $default  reduce using rule 32 (labels)
+
+
+state 124
+
+   77 expr: expr . BITOR expr
+   77     | expr BITOR expr .
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 77 (expr)
+
+
+state 125
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   78     | expr BITXOR expr .
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 78 (expr)
+
+
+state 126
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   79     | expr BITAND expr .
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    RSH  shift, and go to state 86
+    LSH  shift, and go to state 87
+    SUB  shift, and go to state 88
+    ADD  shift, and go to state 89
+    MOD  shift, and go to state 90
+    DIV  shift, and go to state 91
+    MUL  shift, and go to state 92
+
+    $default  reduce using rule 79 (expr)
+
+
+state 127
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   81     | expr RSH expr .
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    SUB  shift, and go to state 88
+    ADD  shift, and go to state 89
+    MOD  shift, and go to state 90
+    DIV  shift, and go to state 91
+    MUL  shift, and go to state 92
+
+    $default  reduce using rule 81 (expr)
+
+
+state 128
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   80     | expr LSH expr .
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    SUB  shift, and go to state 88
+    ADD  shift, and go to state 89
+    MOD  shift, and go to state 90
+    DIV  shift, and go to state 91
+    MUL  shift, and go to state 92
+
+    $default  reduce using rule 80 (expr)
+
+
+state 129
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   83     | expr SUB expr .
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    MOD  shift, and go to state 90
+    DIV  shift, and go to state 91
+    MUL  shift, and go to state 92
+
+    $default  reduce using rule 83 (expr)
+
+
+state 130
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   82     | expr ADD expr .
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    MOD  shift, and go to state 90
+    DIV  shift, and go to state 91
+    MUL  shift, and go to state 92
+
+    $default  reduce using rule 82 (expr)
+
+
+state 131
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+   86     | expr MOD expr .
+
+    $default  reduce using rule 86 (expr)
+
+
+state 132
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   85     | expr DIV expr .
+   86     | expr . MOD expr
+
+    $default  reduce using rule 85 (expr)
+
+
+state 133
+
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   84     | expr MUL expr .
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    $default  reduce using rule 84 (expr)
+
+
+state 134
+
+   76 expr: lval SETMOD expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 76 (expr)
+
+
+state 135
+
+   75 expr: lval SETDIV expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 75 (expr)
+
+
+state 136
+
+   74 expr: lval SETMUL expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 74 (expr)
+
+
+state 137
+
+   73 expr: lval SETSUB expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 73 (expr)
+
+
+state 138
+
+   72 expr: lval SETADD expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 72 (expr)
+
+
+state 139
+
+   71 expr: lval SETRSH expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 71 (expr)
+
+
+state 140
+
+   70 expr: lval SETLSH expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 70 (expr)
+
+
+state 141
+
+   69 expr: lval SETAND expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 69 (expr)
+
+
+state 142
+
+   68 expr: lval SETXOR expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 68 (expr)
+
+
+state 143
+
+   67 expr: lval SETOR expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 67 (expr)
+
+
+state 144
+
+   66 expr: lval SET expr .
+   77     | expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 66 (expr)
+
+
+state 145
+
+   24 args: args ',' type dclr .
+
+    $default  reduce using rule 24 (args)
+
+
+state 146
+
+    7 dcls: dcls dcl ';' .
+
+    $default  reduce using rule 7 (dcls)
+
+
+state 147
+
+   97 lval: ID '[' expr ']' .
+
+    $default  reduce using rule 97 (lval)
+
+
+state 148
+
+   63 exprs: exprs ',' . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 164
+    lval  go to state 56
+
+
+state 149
+
+   92 expr: ID '(' exprs ')' .
+
+    $default  reduce using rule 92 (expr)
+
+
+state 150
+
+   42 stmt: FOR '(' expro ';' . m cexpro ';' m expro n ')' m s lblstmt n m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 165
+
+
+state 151
+
+   58 cexpr: cexpr . AND m cexpr
+   59      | cexpr . OR m cexpr
+   60      | NOT cexpr .
+
+    $default  reduce using rule 60 (cexpr)
+
+
+state 152
+
+   59 cexpr: cexpr OR . m cexpr
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 166
+
+
+state 153
+
+   58 cexpr: cexpr AND . m cexpr
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 167
+
+
+state 154
+
+   38 stmt: IF '(' cexpr ')' . m lblstmt m
+   39     | IF '(' cexpr ')' . m lblstmt ELSE n m lblstmt m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 168
+
+
+state 155
+
+   53 cexpr: expr NE . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 169
+    lval  go to state 56
+
+
+state 156
+
+   52 cexpr: expr EQ . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 170
+    lval  go to state 56
+
+
+state 157
+
+   54 cexpr: expr LE . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 171
+    lval  go to state 56
+
+
+state 158
+
+   56 cexpr: expr LT . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 172
+    lval  go to state 56
+
+
+state 159
+
+   55 cexpr: expr GE . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 173
+    lval  go to state 56
+
+
+state 160
+
+   57 cexpr: expr GT . expr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    expr  go to state 174
+    lval  go to state 56
+
+
+state 161
+
+   40 stmt: WHILE '(' m cexpr . ')' m s lblstmt n m
+   58 cexpr: cexpr . AND m cexpr
+   59      | cexpr . OR m cexpr
+
+    OR   shift, and go to state 152
+    AND  shift, and go to state 153
+    ')'  shift, and go to state 175
+
+
+state 162
+
+   41 stmt: DO m s lblstmt . WHILE '(' m cexpr ')' ';' m
+
+    WHILE  shift, and go to state 176
+
+
+state 163
+
+   26 block: bhead dcls stmts '}' .
+
+    $default  reduce using rule 26 (block)
+
+
+state 164
+
+   63 exprs: exprs ',' expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 63 (exprs)
+
+
+state 165
+
+   42 stmt: FOR '(' expro ';' m . cexpro ';' m expro n ')' m s lblstmt n m
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    NOT     shift, and go to state 114
+    '('     shift, and go to state 50
+
+    $default  reduce using rule 50 (cexpro)
+
+    cexpro  go to state 177
+    cexpr   go to state 178
+    expr    go to state 116
+    lval    go to state 56
+
+
+state 166
+
+   59 cexpr: cexpr OR m . cexpr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    NOT     shift, and go to state 114
+    '('     shift, and go to state 50
+
+    cexpr  go to state 179
+    expr   go to state 116
+    lval   go to state 56
+
+
+state 167
+
+   58 cexpr: cexpr AND m . cexpr
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    NOT     shift, and go to state 114
+    '('     shift, and go to state 50
+
+    cexpr  go to state 180
+    expr   go to state 116
+    lval   go to state 56
+
+
+state 168
+
+   38 stmt: IF '(' cexpr ')' m . lblstmt m
+   39     | IF '(' cexpr ')' m . lblstmt ELSE n m lblstmt m
+
+    $default  reduce using rule 36 (b)
+
+    lblstmt  go to state 181
+    b        go to state 27
+
+
+state 169
+
+   53 cexpr: expr NE expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 53 (cexpr)
+
+
+state 170
+
+   52 cexpr: expr EQ expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 52 (cexpr)
+
+
+state 171
+
+   54 cexpr: expr LE expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 54 (cexpr)
+
+
+state 172
+
+   56 cexpr: expr LT expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 56 (cexpr)
+
+
+state 173
+
+   55 cexpr: expr GE expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 55 (cexpr)
+
+
+state 174
+
+   57 cexpr: expr GT expr .
+   77 expr: expr . BITOR expr
+   78     | expr . BITXOR expr
+   79     | expr . BITAND expr
+   80     | expr . LSH expr
+   81     | expr . RSH expr
+   82     | expr . ADD expr
+   83     | expr . SUB expr
+   84     | expr . MUL expr
+   85     | expr . DIV expr
+   86     | expr . MOD expr
+
+    BITOR   shift, and go to state 83
+    BITXOR  shift, and go to state 84
+    BITAND  shift, and go to state 85
+    RSH     shift, and go to state 86
+    LSH     shift, and go to state 87
+    SUB     shift, and go to state 88
+    ADD     shift, and go to state 89
+    MOD     shift, and go to state 90
+    DIV     shift, and go to state 91
+    MUL     shift, and go to state 92
+
+    $default  reduce using rule 57 (cexpr)
+
+
+state 175
+
+   40 stmt: WHILE '(' m cexpr ')' . m s lblstmt n m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 182
+
+
+state 176
+
+   41 stmt: DO m s lblstmt WHILE . '(' m cexpr ')' ';' m
+
+    '('  shift, and go to state 183
+
+
+state 177
+
+   42 stmt: FOR '(' expro ';' m cexpro . ';' m expro n ')' m s lblstmt n m
+
+    ';'  shift, and go to state 184
+
+
+state 178
+
+   51 cexpro: cexpr .
+   58 cexpr: cexpr . AND m cexpr
+   59      | cexpr . OR m cexpr
+
+    OR   shift, and go to state 152
+    AND  shift, and go to state 153
+
+    $default  reduce using rule 51 (cexpro)
+
+
+state 179
+
+   58 cexpr: cexpr . AND m cexpr
+   59      | cexpr . OR m cexpr
+   59      | cexpr OR m cexpr .
+
+    AND  shift, and go to state 153
+
+    $default  reduce using rule 59 (cexpr)
+
+
+state 180
+
+   58 cexpr: cexpr . AND m cexpr
+   58      | cexpr AND m cexpr .
+   59      | cexpr . OR m cexpr
+
+    $default  reduce using rule 58 (cexpr)
+
+
+state 181
+
+   38 stmt: IF '(' cexpr ')' m lblstmt . m
+   39     | IF '(' cexpr ')' m lblstmt . ELSE n m lblstmt m
+
+    ELSE  shift, and go to state 185
+
+    ELSE      [reduce using rule 34 (m)]
+    $default  reduce using rule 34 (m)
+
+    m  go to state 186
+
+
+state 182
+
+   40 stmt: WHILE '(' m cexpr ')' m . s lblstmt n m
+
+    $default  reduce using rule 33 (s)
+
+    s  go to state 187
+
+
+state 183
+
+   41 stmt: DO m s lblstmt WHILE '(' . m cexpr ')' ';' m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 188
+
+
+state 184
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' . m expro n ')' m s lblstmt n m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 189
+
+
+state 185
+
+   39 stmt: IF '(' cexpr ')' m lblstmt ELSE . n m lblstmt m
+
+    $default  reduce using rule 35 (n)
+
+    n  go to state 190
+
+
+state 186
+
+   38 stmt: IF '(' cexpr ')' m lblstmt m .
+
+    $default  reduce using rule 38 (stmt)
+
+
+state 187
+
+   40 stmt: WHILE '(' m cexpr ')' m s . lblstmt n m
+
+    $default  reduce using rule 36 (b)
+
+    lblstmt  go to state 191
+    b        go to state 27
+
+
+state 188
+
+   41 stmt: DO m s lblstmt WHILE '(' m . cexpr ')' ';' m
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    NOT     shift, and go to state 114
+    '('     shift, and go to state 50
+
+    cexpr  go to state 192
+    expr   go to state 116
+    lval   go to state 56
+
+
+state 189
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m . expro n ')' m s lblstmt n m
+
+    ID      shift, and go to state 67
+    CON     shift, and go to state 35
+    STR     shift, and go to state 36
+    BITAND  shift, and go to state 45
+    SUB     shift, and go to state 46
+    COM     shift, and go to state 47
+    '('     shift, and go to state 50
+
+    $default  reduce using rule 64 (expro)
+
+    expro  go to state 193
+    expr   go to state 113
+    lval   go to state 56
+
+
+state 190
+
+   39 stmt: IF '(' cexpr ')' m lblstmt ELSE n . m lblstmt m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 194
+
+
+state 191
+
+   40 stmt: WHILE '(' m cexpr ')' m s lblstmt . n m
+
+    $default  reduce using rule 35 (n)
+
+    n  go to state 195
+
+
+state 192
+
+   41 stmt: DO m s lblstmt WHILE '(' m cexpr . ')' ';' m
+   58 cexpr: cexpr . AND m cexpr
+   59      | cexpr . OR m cexpr
+
+    OR   shift, and go to state 152
+    AND  shift, and go to state 153
+    ')'  shift, and go to state 196
+
+
+state 193
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro . n ')' m s lblstmt n m
+
+    $default  reduce using rule 35 (n)
+
+    n  go to state 197
+
+
+state 194
+
+   39 stmt: IF '(' cexpr ')' m lblstmt ELSE n m . lblstmt m
+
+    $default  reduce using rule 36 (b)
+
+    lblstmt  go to state 198
+    b        go to state 27
+
+
+state 195
+
+   40 stmt: WHILE '(' m cexpr ')' m s lblstmt n . m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 199
+
+
+state 196
+
+   41 stmt: DO m s lblstmt WHILE '(' m cexpr ')' . ';' m
+
+    ';'  shift, and go to state 200
+
+
+state 197
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro n . ')' m s lblstmt n m
+
+    ')'  shift, and go to state 201
+
+
+state 198
+
+   39 stmt: IF '(' cexpr ')' m lblstmt ELSE n m lblstmt . m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 202
+
+
+state 199
+
+   40 stmt: WHILE '(' m cexpr ')' m s lblstmt n m .
+
+    $default  reduce using rule 40 (stmt)
+
+
+state 200
+
+   41 stmt: DO m s lblstmt WHILE '(' m cexpr ')' ';' . m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 203
+
+
+state 201
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro n ')' . m s lblstmt n m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 204
+
+
+state 202
+
+   39 stmt: IF '(' cexpr ')' m lblstmt ELSE n m lblstmt m .
+
+    $default  reduce using rule 39 (stmt)
+
+
+state 203
+
+   41 stmt: DO m s lblstmt WHILE '(' m cexpr ')' ';' m .
+
+    $default  reduce using rule 41 (stmt)
+
+
+state 204
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro n ')' m . s lblstmt n m
+
+    $default  reduce using rule 33 (s)
+
+    s  go to state 205
+
+
+state 205
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro n ')' m s . lblstmt n m
+
+    $default  reduce using rule 36 (b)
+
+    lblstmt  go to state 206
+    b        go to state 27
+
+
+state 206
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro n ')' m s lblstmt . n m
+
+    $default  reduce using rule 35 (n)
+
+    n  go to state 207
+
+
+state 207
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro n ')' m s lblstmt n . m
+
+    $default  reduce using rule 34 (m)
+
+    m  go to state 208
+
+
+state 208
+
+   42 stmt: FOR '(' expro ';' m cexpro ';' m expro n ')' m s lblstmt n m .
+
+    $default  reduce using rule 42 (stmt)

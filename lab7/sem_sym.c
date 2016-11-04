@@ -173,8 +173,8 @@ struct sem_rec *exprs(struct sem_rec *l, struct sem_rec *e)
  */
 void fhead(struct id_entry *p)
 {
-  fprintf(stderr, "sem: fhead not implemented\n");
-  exit(1);
+  enterblock();
+  //enter block, we know return of fhead is null in this case
 }
 
 /*
@@ -182,8 +182,8 @@ void fhead(struct id_entry *p)
  */
 void blockdcl()
 {
-  fprintf(stderr, "sem: blockdcl not implemented\n");
-  exit(1);
+  enterblock();
+  //enter block
 }
 
 /*
@@ -191,8 +191,8 @@ void blockdcl()
  */
 void btail()
 {
-  fprintf(stderr, "sem: btail not implemented\n");
-  exit(1);
+  leaveblock();
+  //leave once, no function scope to consider
 }
 
 /*
@@ -200,8 +200,9 @@ void btail()
  */
 struct id_entry *fname(int t, char *id)
 {
-  fprintf(stderr, "sem: fname not implemented\n");
-  exit(1);
+  enterblock();
+  return NULL;
+  //enter and return null, dont need to keep track of func names
 }
 
 /*
@@ -209,8 +210,9 @@ struct id_entry *fname(int t, char *id)
  */
 void ftail()
 {
-  fprintf(stderr, "sem: ftail not implemented\n");
-  exit(1);
+  leaveblock();
+  leaveblock();
+  //need to leave the block
 }
 
 /*
