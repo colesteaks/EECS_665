@@ -41,11 +41,11 @@ void dump(int blev, FILE *f)
         if(*q) {
             if((*q)->i_blevel >= blev)
                 //fprintf(f, "%s\t%s\n", q->i_name, q->i_blevel);
-                printf("%s\t%d\n", (*q)->i_name, (*q)->i_blevel);
+                printf("%s\t\t%d\n", (*q)->i_name, (*q)->i_blevel);
                 id_table[i] = NULL;
         }
     }
-   //print correct line, remove item from hash table with requisite block level
+   //print correct line, remove it rom hash table with requisite block level
 }
 
 /*
@@ -74,7 +74,7 @@ void exit_block()
  */
 void enterblock()
 {
-   level += 1;
+   level = level + 1;
 }
 
 /*
@@ -107,8 +107,8 @@ struct id_entry *install(char *name, int blev)
  * leaveblock - exit a block
  */
 void leaveblock()
-{	
-    level -= 1;
+{
+    level = level - 1;
     FILE *f = fopen("result.output", "w");
     dump(level, f);
    //decrement level and call dump
