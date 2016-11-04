@@ -18,10 +18,10 @@ y.tab.h cgram.c: cgram.y
 	mv y.tab.c cgram.c
 
 test:
-	./csym < temp.c
+	./csym < temp.c > test.out
 
 demo:
-	./csym < demo.c
+	./csym < demo.c > demo.out
 
 clean:
-	$(RM) csym sym.o scan.o sem_sym.o semutil.o cgram.o y.tab.h cgram.c y.output
+	$(RM) csym sym.o scan.o sem_sym.o semutil.o cgram.o y.tab.h cgram.c y.output demo.out test.out
