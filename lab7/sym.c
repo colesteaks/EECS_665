@@ -34,7 +34,8 @@ void dump(int blev, FILE *f)
 {
     //fprintf(f, "Dumping \tidentifier \ttable\n");
     printf("Dumping \tidentifier \ttable\n");
-    for(int i = 0; i < ITABSIZE; i++) {
+    int i = 0;
+    for(i; i < ITABSIZE; i++) {
         struct id_entry **q;
         q = &id_table[i];
         if(*q) {
@@ -106,10 +107,10 @@ struct id_entry *install(char *name, int blev)
  * leaveblock - exit a block
  */
 void leaveblock()
-{
+{	
+    level -= 1;
     FILE *f = fopen("result.output", "w");
     dump(level, f);
-    level -= 1;
    //decrement level and call dump
 }
 
