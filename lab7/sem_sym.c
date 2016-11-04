@@ -173,8 +173,7 @@ struct sem_rec *exprs(struct sem_rec *l, struct sem_rec *e)
  */
 void fhead(struct id_entry *p)
 {
-  enterblock();
-  //enter block, we know return of fhead is null in this case
+  //do nothing
 }
 
 /*
@@ -201,6 +200,7 @@ void btail()
 struct id_entry *fname(int t, char *id)
 {
   enterblock();
+  return NULL;
   //enter and return null, dont need to keep track of func names
 }
 

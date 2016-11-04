@@ -37,12 +37,12 @@ void dump(int blev, FILE *f)
     int i = 0;
     for(i=0; i < ITABSIZE; i++) {
     	  if(id_table[i]) {
-           	struct id_entry **q;
-    	      q = &id_table[i];
-            for((*q); (*q); (*q)=(*q)->i_link) {
-                if((*q)->i_blevel >= blev) {
+           	struct id_entry *q = id_table[i];
+            for(q; q!=NULL; q=q->i_link) {
+                if(q->i_blevel >= blev) {
                     //fprintf(f, "%s\t%s\n", q->i_name, q->i_blevel);
-                    printf("%s\t\t%d\n", (*q)->i_name, (*q)->i_blevel);
+                    printf("%s\t\t%d\n", q->i_name, q->i_blevel);
+                    id_table[i] = q->i_link;
                     free(q);
                 }
             }

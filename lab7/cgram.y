@@ -224,7 +224,6 @@ main(int argc, char *argv)
    if (yyparse())
       yyerror("syntax error");
    leaveblock();
-   leaveblock();
    exit(0);
 }
 
