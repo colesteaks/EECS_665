@@ -74,7 +74,7 @@ void exit_block()
  */
 void enterblock()
 {
-   level = level + 1;
+   level += 1;
 }
 
 /*
@@ -108,9 +108,9 @@ struct id_entry *install(char *name, int blev)
  */
 void leaveblock()
 {
-    level = level - 1;
     FILE *f = fopen("result.output", "w");
     dump(level, f);
+    level -= 1;
    //decrement level and call dump
 }
 
