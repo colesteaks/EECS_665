@@ -35,14 +35,16 @@ void dump(int blev, FILE *f)
     //fprintf(f, "Dumping \tidentifier \ttable\n");
     printf("Dumping \tidentifier \ttable\n");
     int i = 0;
-    for(i; i < ITABSIZE; i++) {
-        struct id_entry **q;
-        q = &id_table[i];
-        if(*q) {
-            if((*q)->i_blevel >= blev)
+    for(i=0; i < ITABSIZE; i++) {
+	if(id_table[i]) {
+       	struct id_entry *q;
+	q = &id_table[i];
+        if(*q) { 
+            if((*q)->i_blevel >= blev) {
                 //fprintf(f, "%s\t%s\n", q->i_name, q->i_blevel);
-                printf("%s\t\t%d\n", (*q)->i_name, (*q)->i_blevel);
-                id_table[i] = NULL;
+		printf("%s\t\t%d\n", (*q)->i_name, (*q)->i_blevel);
+                (*q)->i_blevel = 0;
+	    }
         }
     }
    //print correct line, remove it rom hash table with requisite block level
@@ -107,10 +109,10 @@ struct id_entry *install(char *name, int blev)
  * leaveblock - exit a block
  */
 void leaveblock()
-{
-    FILE *f = fopen("result.output", "w");
+{   
+    FILE *f = fopen("result.output", "w");  
     dump(level, f);
-    level -= 1;
+    level-=1;
    //decrement level and call dump
 }
 

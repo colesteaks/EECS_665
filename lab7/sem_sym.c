@@ -200,8 +200,7 @@ void btail()
  */
 struct id_entry *fname(int t, char *id)
 {
-  //enterblock();
-  return NULL;
+  enterblock();
   //enter and return null, dont need to keep track of func names
 }
 
@@ -210,6 +209,7 @@ struct id_entry *fname(int t, char *id)
  */
 void ftail()
 {
+  leaveblock();
   leaveblock();
   //need to leave the block
 }
