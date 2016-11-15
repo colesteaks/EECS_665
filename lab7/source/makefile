@@ -22,6 +22,7 @@ test:
 
 demo:
 	./csym < demo.c > demo.out
+	atom demo.out
 
 clean:
 	$(RM) csym sym.o scan.o sem_sym.o semutil.o cgram.o y.tab.h cgram.c y.output demo.out test.out
