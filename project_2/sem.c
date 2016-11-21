@@ -29,11 +29,10 @@ void bgnstmt()
   extern int lineno;
 
   printf("bgnstmt %d\n", lineno);
-  //   fprintf(stderr, "sem: bgnstmt not implemented\n");
 }
 
 /*
- * call - procedure invocation
+ * TODO: call - procedure invocation
  */
 struct sem_rec *call(char *f, struct sem_rec *args)
 {
@@ -42,12 +41,13 @@ struct sem_rec *call(char *f, struct sem_rec *args)
 }
 
 /*
- * ccand - logical and
+ * ccand - logical and - correct
  */
 struct sem_rec *ccand(struct sem_rec *e1, int m, struct sem_rec *e2)
 {
-   fprintf(stderr, "sem: ccand not implemented\n");
-   return ((struct sem_rec *) NULL);
+  backpatch(e1->back.s_true, m);
+  struct sem_rec *res = merge(e1->s_false, e2->s_false);
+  return node(0, 0, e2->back.s_true, res);
 }
 
 /*
@@ -58,15 +58,15 @@ struct sem_rec *ccexpr(struct sem_rec *e)
    struct sem_rec *t1;
 
    if(e){
-   
+
      t1 = gen("!=", e, cast(con("0"), e->s_mode), e->s_mode);
-     
+
      printf("bt t%d B%d\n", t1->s_place, ++numblabels);
      printf("br B%d\n", ++numblabels);
      return (node(0, 0,
-		  node(numblabels-1, 0, (struct sem_rec *) NULL, 
+		  node(numblabels-1, 0, (struct sem_rec *) NULL,
 		       (struct sem_rec *) NULL),
-		  node(numblabels, 0, (struct sem_rec *) NULL, 
+		  node(numblabels, 0, (struct sem_rec *) NULL,
 		       (struct sem_rec *) NULL)));
    }
    else
@@ -78,8 +78,7 @@ struct sem_rec *ccexpr(struct sem_rec *e)
  */
 struct sem_rec *ccnot(struct sem_rec *e)
 {
-   fprintf(stderr, "sem: ccnot not implemented\n");
-   return ((struct sem_rec *) NULL);
+   return node(0, 0, e->s_false, e->back.s_true);
 }
 
 /*
@@ -107,8 +106,8 @@ struct sem_rec *con(char *x)
 
   /* print the quad t%d = const */
   printf("t%d = %s\n", nexttemp(), x);
-  
-  /* construct a new node corresponding to this constant generation 
+
+  /* construct a new node corresponding to this constant generation
      into a temporary. This will allow this temporary to be referenced
      in an expression later*/
   return(node(currtemp(), p->i_type, (struct sem_rec *) NULL,
@@ -170,7 +169,12 @@ void doif(struct sem_rec *e, int m1, int m2)
 void doifelse(struct sem_rec *e, int m1, struct sem_rec *n,
                          int m2, int m3)
 {
-   fprintf(stderr, "sem: doifelse not implemented\n");
+   backpatch(n->back.s_true, m2);
+   if (e != NULL)
+   {
+     backpatch(e->s_false, m1);
+
+   }
 }
 
 /*
@@ -212,16 +216,24 @@ struct sem_rec *exprs(struct sem_rec *l, struct sem_rec *e)
  */
 void fhead(struct id_entry *p)
 {
-   fprintf(stderr, "sem: fhead not implemented\n");
+   for(int i = 0; i < formalnum; i++)
+   {
+      printf("formal %d", formaltypes[i]);
+   }
+   for(int i = 0; i < localnum; i++)
+   {
+      printf("localloc %d", localtypes[i]);
+   }
 }
 
 /*
- * fname - function declaration
+ * fname - function declaration - correct
  */
 struct id_entry *fname(int t, char *id)
 {
-   fprintf(stderr, "sem: fname not implemented\n");
-   return ((struct id_entry *) NULL);
+  printf("func %s", id);
+  enterblock();
+  return dclr(id, t, 4);
 }
 
 /*
@@ -229,7 +241,9 @@ struct id_entry *fname(int t, char *id)
  */
 void ftail()
 {
-   fprintf(stderr, "sem: ftail not implemented\n");
+  printf("fend");
+  //localnums = 0; --might be the solution to multiple function problems.
+  leaveblock();
 }
 
 /*
@@ -281,6 +295,7 @@ void labeldcl(char *id)
 
 /*
  * m - generate label and return next temporary number
+ *  TODO: what does this mean by label?
  */
 int m()
 {
@@ -357,7 +372,7 @@ struct sem_rec *set(char *op, struct sem_rec *x, struct sem_rec *y)
   /* if for type consistency of x and y */
   cast_y = y;
   if((x->s_mode & T_DOUBLE) && !(y->s_mode & T_DOUBLE)){
-    
+
     /*cast y to a double*/
     printf("t%d = cvf t%d\n", nexttemp(), y->s_place);
     cast_y = node(currtemp(), T_DOUBLE, (struct sem_rec *) NULL,
@@ -373,10 +388,10 @@ struct sem_rec *set(char *op, struct sem_rec *x, struct sem_rec *y)
 
   /*output quad for assignment*/
   if(x->s_mode & T_DOUBLE)
-    printf("t%d := t%d =f t%d\n", nexttemp(), 
+    printf("t%d := t%d =f t%d\n", nexttemp(),
 	   x->s_place, cast_y->s_place);
   else
-    printf("t%d := t%d =i t%d\n", nexttemp(), 
+    printf("t%d := t%d =i t%d\n", nexttemp(),
 	   x->s_place, cast_y->s_place);
 
   /*create a new node to allow just created temporary to be referenced later */
@@ -397,8 +412,9 @@ void startloopscope()
  */
 struct sem_rec *string(char *s)
 {
-   fprintf(stderr, "sem: string not implemented\n");
-   return ((struct sem_rec *) NULL);
+   printf("t%d := %s", nexttemp(), s);
+   //TODO: return a sem rec?
+   return (struct sem_rec *) NULL;
 }
 
 

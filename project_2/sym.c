@@ -1,7 +1,7 @@
 /* symbol table management */
 
 # include <stdio.h>
-# include <malloc.h>
+//# include <malloc.h>
 # include <stdlib.h>
 # include <string.h>
 # include "cc.h"
@@ -37,7 +37,7 @@ void dump(int blev, FILE *f)
    for (i = id_table; i < &id_table[ITABSIZE]; i++)
       for (p = *i; p; p = p->i_link)
          if (p->i_blevel >= blev)
-            fprintf(f, "%s\t%d\t%d\t%d\n", p->i_name, p->i_blevel, 
+            fprintf(f, "%s\t%d\t%d\t%d\n", p->i_name, p->i_blevel,
              p->i_type, p->i_defined);
 }
 
@@ -72,12 +72,12 @@ void enterblock()
 }
 
 /*
- * install - install name with block level blev, return ptr 
+ * install - install name with block level blev, return ptr
  */
 struct id_entry *install(char *name, int blev)
 {
    struct id_entry *ip, **q;
-   
+
    if (blev < 0)
       blev = level;
 
@@ -145,19 +145,19 @@ void sdump(FILE *f)
 }
 
 /*
- * slookup - lookup str in string table, install if necessary, return ptr 
+ * slookup - lookup str in string table, install if necessary, return ptr
  */
 char *slookup(char str[])
 {
    struct s_chain *p;
    int i, k;
-   
+
    for (k = i = 0; i < 5; i++)	/* simple hash function */
       if (str[i])
          k += str[i];
       else
          break;
-   
+
    k %= STABSIZE;
    for (p = str_table[k]; p; p = p->s_next)
       if (strcmp(str, p->s_ptr) == 0)
@@ -176,7 +176,7 @@ char *slookup(char str[])
 int hash(char *s)
 {
    return((int ) s);
-}   
+}
 
 /*
  * alloc - alloc space

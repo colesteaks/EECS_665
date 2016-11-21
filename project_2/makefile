@@ -17,5 +17,8 @@ y.tab.h cgram.c: cgram.y
 	yacc -vd cgram.y
 	mv y.tab.c cgram.c
 
+test:
+	./sem_base.exe < test.c
+
 clean:
 	rm csem sym.o scan.o sem.o semutil.o cgram.o
