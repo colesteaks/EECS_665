@@ -33,9 +33,15 @@ void bgnstmt()
 
 /*
  * TODO: call - procedure invocation
+ * How do we get # of args, and in what order is this called (refer to notes?)
  */
 struct sem_rec *call(char *f, struct sem_rec *args)
 {
+  struct id_entry *p;
+
+  if((p = lookup(x, 0)) != NULL) {
+    printf("t%d := ")
+  }
    fprintf(stderr, "sem: call not implemented\n");
    return ((struct sem_rec *) NULL);
 }
@@ -75,6 +81,7 @@ struct sem_rec *ccexpr(struct sem_rec *e)
 
 /*
  * ccnot - logical not
+ * TODO: check for correctness.
  */
 struct sem_rec *ccnot(struct sem_rec *e)
 {
@@ -83,11 +90,12 @@ struct sem_rec *ccnot(struct sem_rec *e)
 
 /*
  * ccor - logical or
+ * TODO: check for correctness.
  */
 struct sem_rec *ccor(struct sem_rec *e1, int m, struct sem_rec *e2)
 {
-   fprintf(stderr, "sem: ccor not implemented\n");
-   return ((struct sem_rec *) NULL);
+   return (node(,,merge(e1->back.s_true, e2->back.s_true), ))
+   //potentially merge false or true depending on result
 }
 
 /*
@@ -152,7 +160,7 @@ void dofor(int m1, struct sem_rec *e2, int m2, struct sem_rec *n1,
  */
 void dogoto(char *id)
 {
-   fprintf(stderr, "sem: dogoto not implemented\n");
+   lookup(id, 0);
 }
 
 /*
@@ -165,6 +173,7 @@ void doif(struct sem_rec *e, int m1, int m2)
 
 /*
  * doifelse - if then else statement
+ * TODO: incomplete
  */
 void doifelse(struct sem_rec *e, int m1, struct sem_rec *n,
                          int m2, int m3)
@@ -173,7 +182,6 @@ void doifelse(struct sem_rec *e, int m1, struct sem_rec *n,
    if (e != NULL)
    {
      backpatch(e->s_false, m1);
-
    }
 }
 
@@ -212,7 +220,7 @@ struct sem_rec *exprs(struct sem_rec *l, struct sem_rec *e)
 }
 
 /*
- * fhead - beginning of function body
+ * fhead - beginning of function body - correct
  */
 void fhead(struct id_entry *p)
 {
@@ -237,7 +245,7 @@ struct id_entry *fname(int t, char *id)
 }
 
 /*
- * ftail - end of function body
+ * ftail - end of function body - correct
  */
 void ftail()
 {
@@ -295,12 +303,12 @@ void labeldcl(char *id)
 
 /*
  * m - generate label and return next temporary number
- *  TODO: what does this mean by label?
+ *  TODO: check for correctness.
  */
 int m()
 {
-   fprintf(stderr, "sem: m not implemented\n");
-   return (0);
+   printf("t%d", nexttemp());
+   return (curtemp());
 }
 
 /*
@@ -314,6 +322,7 @@ struct sem_rec *n()
 
 /*
  * op1 - unary operators
+ * TODO: how does this differ for other unary ops besides "@"
  */
 struct sem_rec *op1(char *op, struct sem_rec *y)
 {
@@ -324,31 +333,50 @@ struct sem_rec *op1(char *op, struct sem_rec *y)
     return (gen(op, (struct sem_rec *) NULL, y, y->s_mode));
   }
   else{
-    fprintf(stderr, "sem: op1 not implemented\n");
-    return ((struct sem_rec *) NULL);
+    return (gen(op, (struct sem_rec *) NULL, y, y->s_mode));
   }
 }
 
 /*
  * op2 - arithmetic operators
+ * TODO: check for correctness.
  */
 struct sem_rec *op2(char *op, struct sem_rec *x, struct sem_rec *y)
 {
-   fprintf(stderr, "sem: op2 not implemented\n");
-   return ((struct sem_rec *) NULL);
+  struct sem_rec *cast_y;
+  /* if for type consistency of x and y */
+  cast_y = y;
+  if((x->s_mode & T_DOUBLE) && !(y->s_mode & T_DOUBLE)){
+
+    /*cast y to a double*/
+    printf("t%d = cvf t%d\n", nexttemp(), y->s_place);
+    cast_y = node(currtemp(), T_DOUBLE, (struct sem_rec *) NULL,
+		  (struct sem_rec *) NULL);
+  }
+  else if((x->s_mode & T_INT) && !(y->s_mode & T_INT)){
+
+    /*convert y to integer*/
+    printf("t%d = cvi t%d\n", nexttemp(), y->s_place);
+    cast_y = node(currtemp(), T_INT, (struct sem_rec *) NULL,
+		  (struct sem_rec *) NULL);
+  }
+
+  /*return gen op for with type casted result.*/
+  return (gen(op, x, cast_y, cast_y->s_mode));
 }
 
 /*
  * opb - bitwise operators
+ * TODO: check for correctness.
  */
 struct sem_rec *opb(char *op, struct sem_rec *x, struct sem_rec *y)
 {
-   fprintf(stderr, "sem: opb not implemented\n");
-   return ((struct sem_rec *) NULL);
+  return (gen(op, x, y, T_INT));
 }
 
 /*
  * rel - relational operators
+ * TODO: how does this need to be different than op2??
  */
 struct sem_rec *rel(char *op, struct sem_rec *x, struct sem_rec *y)
 {
@@ -358,6 +386,7 @@ struct sem_rec *rel(char *op, struct sem_rec *x, struct sem_rec *y)
 
 /*
  * set - assignment operators
+ * TODO: null cases.
  */
 struct sem_rec *set(char *op, struct sem_rec *x, struct sem_rec *y)
 {
