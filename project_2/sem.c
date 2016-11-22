@@ -19,6 +19,9 @@ char *gotolist[MAXSIZE];                /* keep track of existing gotos */
 char type_char(int type);
 void del_goto(int index);
 struct sem_rec *recast_y(struct sem_rec *x, struct sem_rec *y);
+int nextnumb();
+int nextnum();
+int type_width(int type);
 
 /*
  * backpatch - backpatch list of quadruples starting at p with k
@@ -26,8 +29,8 @@ struct sem_rec *recast_y(struct sem_rec *x, struct sem_rec *y);
  */
 void backpatch(struct sem_rec *p, int k)
 {
-   printf("B%d=L%d\n", p->s_place, k);
-   p->s_place = k;
+   printf("B%d=L%d\n", p->s_place, k+1);
+   p->s_place = k+1;
 }
 
 /*
@@ -274,11 +277,25 @@ void fhead(struct id_entry *p)
    int i;
    for(i = 0; i < formalnum; i++)
    {
-      printf("formal %d\n", tsize(formaltypes[i]));
+     if (formaltypes[i] == i)
+     {
+       printf("formal 4\n");
+     }
+     else
+     {
+       printf("formal 8\n");
+     }
    }
    for(i = 0; i < localnum; i++)
    {
-      printf("localloc %d\n", tsize(localtypes[i]));
+     if (localtypes[i] == i)
+     {
+       printf("local 4\n");
+     }
+     else
+     {
+       printf("local 8\n");
+     }
    }
 }
 
@@ -504,13 +521,24 @@ struct sem_rec *string(char *s)
 
 
 /************* Helper Functions **************/
+int type_width(int type)
+{
+  if (type & T_INT)
+  {
+    return 4;
+  }
+  else
+  {
+    return 8;
+  }
+}
 
 /*
 * nextnumb - returns next numblabel
 */
 int nextnumb()
 {
-    return ++numlabels;
+    return ++numblabels;
 }
 
 /*
