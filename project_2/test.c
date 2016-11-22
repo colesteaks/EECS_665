@@ -1,6 +1,4 @@
-#include <stdio.h>
-
-double m[6]
+double m[6];
 
 scale(double x) {
   int i;

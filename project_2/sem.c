@@ -18,6 +18,7 @@ char *gotolist[MAXSIZE];                /* keep track of existing gotos */
 
 char type_char(int type);
 void del_goto(int index);
+struct sem_rec *recast_y(struct sem_rec *x, struct sem_rec *y);
 
 /*
  * backpatch - backpatch list of quadruples starting at p with k
@@ -25,7 +26,7 @@ void del_goto(int index);
  */
 void backpatch(struct sem_rec *p, int k)
 {
-   printf("B%d=L%d", p->s_place, k);
+   printf("B%d=L%d\n", p->s_place, k);
    p->s_place = k;
 }
 
@@ -50,19 +51,19 @@ struct sem_rec *call(char *f, struct sem_rec *args)
 
   while(arg)
   {
-    printf("arg%c t%d", type_char(arg->s_mode), arg->s_place);
+    printf("arg%c t%d\n", type_char(arg->s_mode), arg->s_place);
     arg = arg->back.s_link;
     arg_count++;
   }
 
   struct id_entry *p;
-  printf("t%d := global %s", nexttemp(), f);
+  printf("t%d := global %s\n", nexttemp(), f);
   int ret_type = T_INT;
   if((p = lookup(f, 2)) != NULL) {
     ret_type = p->i_type;
   }
   int t = currtemp();
-  printf("t%d := f%c t%d %d", nexttemp(), type_char(ret_type), t, arg_count);
+  printf("t%d := f%c t%d %d\n", nexttemp(), type_char(ret_type), t, arg_count);
   return node(currtemp(), ret_type, NULL, NULL);
 }
 
@@ -133,7 +134,7 @@ struct sem_rec *con(char *x)
   }
 
   /* print the quad t%d = const */
-  printf("t%d = %s\n", nexttemp(), x);
+  printf("t%d := %s\n", nexttemp(), x);
 
   /* construct a new node corresponding to this constant generation
      into a temporary. This will allow this temporary to be referenced
@@ -195,7 +196,7 @@ void dogoto(char *id)
    struct id_entry *look_up = lookup(id, 0);
    if (look_up)
    {
-     printf("br L%d", look_up->i_width);
+     printf("br L%d\n", look_up->i_width);
      return;
    }
 
@@ -232,7 +233,7 @@ void doifelse(struct sem_rec *e, int m1, struct sem_rec *n,
  */
 void doret(struct sem_rec *e)
 {
-  printf("ret%c t%d", type_char(e->s_mode), currtemp());
+  printf("ret%c t%d\n", type_char(e->s_mode), currtemp());
 }
 
 /*
@@ -273,11 +274,11 @@ void fhead(struct id_entry *p)
    int i;
    for(i = 0; i < formalnum; i++)
    {
-      printf("formal %d", formaltypes[i]);
+      printf("formal %d\n", tsize(formaltypes[i]));
    }
    for(i = 0; i < localnum; i++)
    {
-      printf("localloc %d", localtypes[i]);
+      printf("localloc %d\n", tsize(localtypes[i]));
    }
 }
 
@@ -286,7 +287,7 @@ void fhead(struct id_entry *p)
  */
 struct id_entry *fname(int t, char *id)
 {
-  printf("func %s", id);
+  printf("func %s\n", id);
   enterblock();
   return dclr(id, t, 4);
 }
@@ -346,7 +347,7 @@ struct sem_rec *tom_index(struct sem_rec *x, struct sem_rec *i)
  */
 void labeldcl(char *id)
 {
-   printf("label L%d", ++numlabels);
+   printf("label L%d\n", ++numlabels);
 
    struct id_entry *temp;
    temp = dclr(id, T_INT, 4);
@@ -359,7 +360,7 @@ void labeldcl(char *id)
      {
        struct id_entry *t2;
        t2 = lookup(id, 0);
-       printf("B%d=L%d", ++numblabels, t2->i_width); //TODO: are the numbers being printed here correct?
+       printf("B%d=L%d\n", ++numblabels, t2->i_width); //TODO: are the numbers being printed here correct?
        //TODO: do I need to then backpatch after I find label in goto list?
      }
    }
@@ -371,7 +372,7 @@ void labeldcl(char *id)
  */
 int m()
 {
-   printf("label L%d", ++numlabels);
+   printf("label L%d\n", ++numlabels);
    return(numlabels-1);
 }
 
@@ -380,7 +381,7 @@ int m()
  */
 struct sem_rec *n()
 {
-   printf("br B%d", ++numblabels);
+   printf("br B%d\n", ++numblabels);
    return node(numblabels, 0, 0, 0);
 }
 
@@ -412,24 +413,7 @@ struct sem_rec *op1(char *op, struct sem_rec *y)
 struct sem_rec *op2(char *op, struct sem_rec *x, struct sem_rec *y)
 {
   struct sem_rec *cast_y;
-  /* if for type consistency of x and y */
-  cast_y = y;
-  if((x->s_mode & T_DOUBLE) && !(y->s_mode & T_DOUBLE)){
-
-    /*cast y to a double*/
-    printf("t%d = cvf t%d\n", nexttemp(), y->s_place);
-    cast_y = node(currtemp(), T_DOUBLE, (struct sem_rec *) NULL,
-		  (struct sem_rec *) NULL);
-  }
-  else if((x->s_mode & T_INT) && !(y->s_mode & T_INT)){
-
-    /*convert y to integer*/
-    printf("t%d = cvi t%d\n", nexttemp(), y->s_place);
-    cast_y = node(currtemp(), T_INT, (struct sem_rec *) NULL,
-		  (struct sem_rec *) NULL);
-  }
-
-  /*return gen op for with type casted result.*/
+  cast_y = recast_y(x,y);
   return (gen(op, x, cast_y, cast_y->s_mode));
 }
 
@@ -450,8 +434,16 @@ struct sem_rec *opb(char *op, struct sem_rec *x, struct sem_rec *y)
  */
 struct sem_rec *rel(char *op, struct sem_rec *x, struct sem_rec *y)
 {
-   fprintf(stderr, "sem: rel not implemented\n");
-   return ((struct sem_rec *) NULL);
+   struct sem_rec *temp;
+   recast_y(x, y);
+   temp = gen(op, x, y, x->s_mode);
+   printf("bt t%d B%d\n", temp->s_place, ++numblabels);
+   printf("br B%d\n", ++numblabels);
+
+   temp->back.s_true = node(numblabels-1, temp->s_mode,0,0);
+   temp->s_false = node(numblabels, temp->s_mode,0,0);
+
+   return temp;
 }
 
 /*
@@ -465,7 +457,7 @@ struct sem_rec *set(char *op, struct sem_rec *x, struct sem_rec *y)
 
   if(x==NULL || y==NULL)
   {
-    printf("Arguments to set cannot be null");
+    printf("Arguments to set cannot be null\n");
     return NULL;
   }
 
@@ -475,21 +467,7 @@ struct sem_rec *set(char *op, struct sem_rec *x, struct sem_rec *y)
   }
 
   /* if for type consistency of x and y */
-  cast_y = y;
-  if((x->s_mode & T_DOUBLE) && !(y->s_mode & T_DOUBLE)){
-
-    /*cast y to a double*/
-    printf("t%d = cvf t%d\n", nexttemp(), y->s_place);
-    cast_y = node(currtemp(), T_DOUBLE, (struct sem_rec *) NULL,
-		  (struct sem_rec *) NULL);
-  }
-  else if((x->s_mode & T_INT) && !(y->s_mode & T_INT)){
-
-    /*convert y to integer*/
-    printf("t%d = cvi t%d\n", nexttemp(), y->s_place);
-    cast_y = node(currtemp(), T_INT, (struct sem_rec *) NULL,
-		  (struct sem_rec *) NULL);
-  }
+  cast_y = recast_y(x, y);
 
   /*output quad for assignment*/
   if(x->s_mode & T_DOUBLE)
@@ -526,6 +504,29 @@ struct sem_rec *string(char *s)
 
 
 /************* Helper Functions **************/
+
+struct sem_rec *recast_y(struct sem_rec *x, struct sem_rec *y)
+{
+  struct sem_rec *casted_y;
+  /* if for type consistency of x and y */
+  casted_y = y;
+  if((x->s_mode & T_DOUBLE) && !(y->s_mode & T_DOUBLE)){
+
+    /*cast y to a double*/
+    printf("t%d := cvf t%d\n", nexttemp(), y->s_place);
+    casted_y = node(currtemp(), T_DOUBLE, (struct sem_rec *) NULL,
+		  (struct sem_rec *) NULL);
+  }
+  else if((x->s_mode & T_INT) && !(y->s_mode & T_INT)){
+
+    /*convert y to integer*/
+    printf("t%d := cvi t%d\n", nexttemp(), y->s_place);
+    casted_y = node(currtemp(), T_INT, (struct sem_rec *) NULL,
+		  (struct sem_rec *) NULL);
+  }
+
+  return casted_y;
+}
 
 /*
 * del_goto - removes id from the goto list.
