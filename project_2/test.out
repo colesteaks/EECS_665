@@ -1,0 +1,59 @@
+alloc m 48
+func scale
+formal 0
+localloc 0
+bgnstmt 6
+t1 := param 0
+t2 := @f t1
+t3 := 0
+t4 := cvf t3
+t5 := t2 ==f t3
+bt t5 B0
+br B0
+label L0
+bgnstmt 6
+t6 := 0
+reti t6
+label L2
+B1=L0
+B2=L1
+bgnstmt 8
+t7 := local 0
+t8 := 0
+t9 := t7 =i t8
+label L3
+t10 := local 0
+t11 := @i t10
+t12 := 6
+t13 := t11 <i t12
+bt t13 B3
+br B3
+label L4
+t14 := local 0
+t15 := 1
+t16 := @i t14
+t17 := t16 +i t15
+t18 := t14 =i t17
+br B4
+label L5
+bgnstmt 8
+bgnstmt 9
+t19 := local 0
+t20 := @i t19
+t21 := global m
+t22 := t21 []f t20
+t23 := param 0
+t24 := @f t23
+t25 := @f t22
+t26 := t25 *f t24
+t27 := t22 =f t26
+br B5
+label L6
+B3=L4
+B4=L5
+B5=L2
+B6=L3
+bgnstmt 11
+t28 := 1
+reti t28
+fend
