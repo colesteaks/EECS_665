@@ -3,6 +3,7 @@
 # include "semutil.h"
 # include "sem.h"
 # include "sym.h"
+# define MAXSIZE 1024
 
 extern int formalnum;
 extern char formaltypes[];
@@ -12,18 +13,25 @@ extern int localwidths[];
 
 int numlabels = 0;                      /* total labels in file */
 int numblabels = 0;                     /* toal backpatch labels in file */
+int gotosize = 0;                       /* total items in goto list */
+char *gotolist[MAXSIZE];                /* keep track of existing gotos */
 
-char ret_char(int type);
+char type_char(int type);
+void del_goto(int index);
+
 /*
- * TODO: backpatch - backpatch list of quadruples starting at p with k
+ * backpatch - backpatch list of quadruples starting at p with k
+ * TODO: check for correctness.
  */
 void backpatch(struct sem_rec *p, int k)
 {
-   fprintf(stderr, "sem: backpatch not implemented\n");
+   printf("B%d=L%d", p->s_place, k)
+   p->s_place = k;
 }
 
 /*
- * TODO: bgnstmt - encountered the beginning of a statement
+ * bgnstmt - encountered the beginning of a statement
+ * TODO: check for correctness.
  */
 void bgnstmt()
 {
@@ -42,7 +50,7 @@ struct sem_rec *call(char *f, struct sem_rec *args)
 
   while(arg)
   {
-    print("arg%c t%d", ret_char(arg->s_mode), arg->s_place);
+    print("arg%c t%d", type_char(arg->s_mode), arg->s_place);
     arg = arg->back.s_link;
     arg_count++;
   }
@@ -54,7 +62,7 @@ struct sem_rec *call(char *f, struct sem_rec *args)
     ret_type = p->i_type;
   }
   int t = currtemp();
-  printf("t%d := f%c t%d %d", nexttemp(), ret_char(ret_type), t, arg_count);
+  printf("t%d := f%c t%d %d", nexttemp(), type_char(ret_type), t, arg_count);
   return node(currtemp(), ret_type, NULL, NULL);
 }
 
@@ -69,7 +77,7 @@ struct sem_rec *ccand(struct sem_rec *e1, int m, struct sem_rec *e2)
 }
 
 /*
- * ccexpr - convert arithmetic expression to logical expression
+ * ccexpr - convert arithmetic expression to logical expression - given
  */
 struct sem_rec *ccexpr(struct sem_rec *e)
 {
@@ -101,18 +109,17 @@ struct sem_rec *ccnot(struct sem_rec *e)
 }
 
 /*
- * ccor - logical or
- * TODO: check for correctness.
+ * ccor - logical or - correct
+ *
  */
 struct sem_rec *ccor(struct sem_rec *e1, int m, struct sem_rec *e2)
 {
-  backpatch(e1->s_false, m);  
-  return (node(,,merge(e1->back.s_true, e2->back.s_true), ))
-   //potentially merge false or true depending on result
+  backpatch(e1->s_false, m);
+  return (node(0,0,merge(e1->back.s_true, e2->back.s_true), e2->s_false));
 }
 
 /*
- * con - constant reference in an expression
+ * con - constant reference in an expression - given
  */
 struct sem_rec *con(char *x)
 {
@@ -136,67 +143,87 @@ struct sem_rec *con(char *x)
 }
 
 /*
- * TODO: dobreak - break statement
+ * dobreak - break statement
+ * TODO: check for correctness.
  */
 void dobreak()
 {
-   fprintf(stderr, "sem: dobreak not implemented\n");
+   n();
+   leaveblock();
 }
 
 /*
- * TODO: docontinue - continue statement
+ * docontinue - continue statement
+ * TODO: see comments
  */
 void docontinue()
 {
-   fprintf(stderr, "sem: docontinue not implemented\n");
+   //fprintf(stderr, "sem: docontinue not implemented\n");
+   //TODO: do we need to do anything here?
 }
 
 /*
- * TODO: dodo - do statement
+ * dodo - do statement
+ * TODO: check for correctness.
  */
 void dodo(int m1, int m2, struct sem_rec *e, int m3)
 {
-   fprintf(stderr, "sem: dodo not implemented\n");
+   backpatch(e->back.s_true, m1);
+   backpatch(e->s_false, m3);
+   backpatch(e, m2);
 }
 
 /*
- * TODO: dofor - for statement
+ * dofor - for statement
+ * TODO: check for correctness.
  */
 void dofor(int m1, struct sem_rec *e2, int m2, struct sem_rec *n1,
            int m3, struct sem_rec *n2, int m4)
 {
-   fprintf(stderr, "sem: dofor not implemented\n");
+   backpatch(e2->back.s_true, m3);
+   backpatch(e2->s_false, m4);
+   backpatch(n1, m1);
+   backpatch(n2, m2);
 }
 
 /*
- * TODO: dogoto - goto statement
+ * dogoto - goto statement
+ * TODO: see comments below.
  */
 void dogoto(char *id)
 {
-   lookup(id, 0);
+   struct id_entry *look_up = lookup(id, 0);
+   if (look_up)
+   {
+     printf("br L%d", look_up->i_width);
+     return;
+   }
+
+   gotolist[gotosize] = id;
+   gotosize++;
+   //TODO: do we need some number associated with this? or is it another backpatch?
 }
 
 /*
- * TODO: doif - one-arm if statement
+ *  doif - one-arm if statement
+ *  TODO: check for correctness.
  */
 void doif(struct sem_rec *e, int m1, int m2)
 {
-   fprintf(stderr, "sem: doif not implemented\n");
+   backpatch(e->back.s_true, m1);
+   backpatch(e->s_false, m2);
 }
 
 /*
  * doifelse - if then else statement
- * TODO: incomplete
+ * TODO: check for correctness.
  */
 void doifelse(struct sem_rec *e, int m1, struct sem_rec *n,
                          int m2, int m3)
 {
    backpatch(e->back.s_true, m1);
-   backpatch(n, m2);
-   if (e != NULL)
-   {
-     backpatch(e->s_false, m1);
-   }
+   backpatch(e->s_false, m2)
+   backpatch(n, m3);
 }
 
 /*
@@ -205,14 +232,7 @@ void doifelse(struct sem_rec *e, int m1, struct sem_rec *n,
  */
 void doret(struct sem_rec *e)
 {
-  if (e->s_mode & T_DOUBLE)
-  {
-      printf("retf t%d",currtemp());
-  }
-  else if (e->s_mode & T_INT)
-  {
-      printf("reti t%d",currtemp());
-  }
+  printf("ret%c t%d", type_char(e->s_mode), currtemp());
 }
 
 /*
@@ -228,20 +248,20 @@ void dowhile(int m1, struct sem_rec *e, int m2, struct sem_rec *n,
 }
 
 /*
- * TODO: endloopscope - end the scope for a loop
+ * endloopscope - end the scope for a loop
+ * TODO: check for correctness.
  */
 void endloopscope(int m)
 {
-   fprintf(stderr, "sem: endloopscope not implemented\n");
+   leaveblock();
 }
 
 /*
  * exprs - form a list of expressions
- * TODO: check for correctness
+ * TODO: check for correctness !important
  */
 struct sem_rec *exprs(struct sem_rec *l, struct sem_rec *e)
 {
-   //concatenate lists of exprs.
    return merge(l, r);
 }
 
@@ -320,35 +340,51 @@ struct sem_rec *tom_index(struct sem_rec *x, struct sem_rec *i)
 }
 
 /*
- * TODO: labeldcl - process a label declaration
+ * labeldcl - process a label declaration
+ * TODO: see comments below.
  */
 void labeldcl(char *id)
 {
-   fprintf(stderr, "sem: labeldcl not implemented\n");
+   printf("label L%d", ++numlabels);
+
+   struct id_entry *temp;
+   temp = dclr(id, T_INT, 4);
+   temp->i_width = numlabels;
+
+   for (int i = 0; i < gotosize; i++)
+   {
+     if (id == gotolist[i])
+     {
+       struct id_entry *t2;
+       t2 = lookup(id, 0);
+       printf("B%d=L%d", ++numblabels, t2->i_width) //TODO: are the numbers being printed here correct?
+       //TODO: do I need to then backpatch after I find label in goto list?
+     }
+   }
 }
 
 /*
- * m - generate label and return next temporary number
- *  TODO: check for correctness.
+ * m - generate label and return next temporary number - correct
+ *
  */
 int m()
 {
-   printf("t%d", nexttemp());
-   return (curtemp());
+   printf("label L%d", ++numlabels);
+   return(numlabels-1);
 }
 
 /*
- * TODO: n - generate goto and return backpatch pointer
+ *  n - generate goto and return backpatch pointer - correct
  */
 struct sem_rec *n()
 {
-   fprintf(stderr, "sem: n not implemented\n");
-   return ((struct sem_rec *) NULL);
+   printf("br B%d", ++numblabels);
+   return node(numblabels, 0, 0, 0);
 }
 
 /*
  * op1 - unary operators
- * TODO: how does this differ for other unary ops besides "@"
+ * TODO: check for correctness
  */
 struct sem_rec *op1(char *op, struct sem_rec *y)
 {
@@ -358,14 +394,18 @@ struct sem_rec *op1(char *op, struct sem_rec *y)
     y->s_mode &= ~T_ADDR;
     return (gen(op, (struct sem_rec *) NULL, y, y->s_mode));
   }
-  else{
-    return (gen(op, (struct sem_rec *) NULL, y, y->s_mode));
+  else if ((y->s_mode == T_DOUBLE) && (op == '~'))
+  {
+    y = cast(y, T_INT);
+    return (gen(op, 0, y, T_INT));
   }
+
+  return (gen(op, (struct sem_rec *) NULL, y, y->s_mode));
 }
 
 /*
  * op2 - arithmetic operators
- * TODO: check for correctness.
+ * TODO: check for correctness
  */
 struct sem_rec *op2(char *op, struct sem_rec *x, struct sem_rec *y)
 {
@@ -393,10 +433,12 @@ struct sem_rec *op2(char *op, struct sem_rec *x, struct sem_rec *y)
 
 /*
  * opb - bitwise operators
- * TODO: check for correctness.
+ * TODO: check for correctness
  */
 struct sem_rec *opb(char *op, struct sem_rec *x, struct sem_rec *y)
 {
+  cast(x, T_INT);
+  cast(y, T_INT);
   return (gen(op, x, y, T_INT));
 }
 
@@ -412,16 +454,22 @@ struct sem_rec *rel(char *op, struct sem_rec *x, struct sem_rec *y)
 
 /*
  * set - assignment operators
- * TODO: null cases.
+ * TODO: check for correctness.
  */
 struct sem_rec *set(char *op, struct sem_rec *x, struct sem_rec *y)
 {
   /* assign the value of expression y to the lval x */
   struct sem_rec *p, *cast_y;
 
-  if(*op!='\0' || x==NULL || y==NULL){
-    fprintf(stderr, "sem: set not implemented\n");
-    return((struct sem_rec *) NULL);
+  if(x==NULL || y==NULL)
+  {
+    printf("Arguments to set cannot be null");
+    return NULL;
+  }
+
+  if(*op!='\0'){
+    struct sem_rec *temp = op1("@", x);
+    y = gen(op, temp, y, x->s_mode);
   }
 
   /* if for type consistency of x and y */
@@ -455,21 +503,22 @@ struct sem_rec *set(char *op, struct sem_rec *x, struct sem_rec *y)
 }
 
 /*
- * TODO: startloopscope - start the scope for a loop
+ * startloopscope - start the scope for a loop
+ * TODO: check for correctness.
  */
 void startloopscope()
 {
-   fprintf(stderr, "sem: startloopscope not implemented\n");
+   enterblock();
 }
 
 /*
- * TODO: string - generate code for a string
+ * string - generate code for a string
+ * TODO: check for correctness.
  */
 struct sem_rec *string(char *s)
 {
-   printf("t%d := %s", nexttemp(), s);
-   //TODO: return a sem rec?
-   return (struct sem_rec *) NULL;
+   printf("t%d := %s\n", nexttemp(), s);
+   return (node(currtemp(), T_STR, 0, 0));
 }
 
 
@@ -477,14 +526,38 @@ struct sem_rec *string(char *s)
 /************* Helper Functions **************/
 
 /*
-*  TODO: ret_char - return the correct charactyer based on type int.
+* del_goto - removes id from the goto list.
 */
-char ret_char(int type) {
+void del_goto(int index)
+{
+  if (index < gotosize-1)
+  {
+      for (int i = index; i < gotosize-1; i++)
+      {
+        gotolist[index] = gotolist[index+1];
+      }
+  }
+  //remove last item which is now duplicated.
+  gotolist[gotosize-1] = NULL;
+}
+
+/*
+*  type_char - return the correct character based on type int.
+*/
+char type_char(int type)
+{
   char var = '?';
-
-
+  if (type == T_INT)
+  {
+    return 'i';
+  }
+  else if (type == T_DOUBLE)
+  {
+    return 'f';
+  }
   return var;
 }
+
 /*
  * cast - force conversion of datum y to type t
  */
