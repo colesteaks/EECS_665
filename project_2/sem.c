@@ -26,8 +26,8 @@ struct sem_rec *recast_y(struct sem_rec *x, struct sem_rec *y);
  */
 void backpatch(struct sem_rec *p, int k)
 {
-   printf("B%d=L%d\n", p->s_place, k);
-   p->s_place = k;
+   printf("B%d=L%d\n", p->s_place, k+1);
+   p->s_place = k+1;
 }
 
 /*
@@ -510,7 +510,7 @@ struct sem_rec *string(char *s)
 */
 int nextnumb()
 {
-    return ++numlabels;
+    return ++numblabels;
 }
 
 /*
