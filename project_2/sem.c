@@ -510,16 +510,7 @@ struct sem_rec *string(char *s)
 */
 int nextnumb()
 {
-    if (numblabels == 0)
-    {
-        numblabels++;
-        return 0;
-    }
-    else
-    {
-        numblabels++;
-        return numlabels;
-    }
+    return ++numlabels;
 }
 
 /*
@@ -527,16 +518,7 @@ int nextnumb()
 */
 int nextnum()
 {
-    if (numlabels == 0)
-    {
-        numlabels++;
-        return 0;
-    }
-    else
-    {
-        numlabels++;
-        return numlabels;
-    }
+    return ++numlabels;
 }
 
 /*
