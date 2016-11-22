@@ -88,8 +88,8 @@ struct sem_rec *ccexpr(struct sem_rec *e)
 
      t1 = gen("!=", e, cast(con("0"), e->s_mode), e->s_mode);
 
-     printf("bt t%d B%d\n", t1->s_place, ++numblabels);
-     printf("br B%d\n", ++numblabels);
+     printf("bt t%d B%d\n", t1->s_place, nextnumb());
+     printf("br B%d\n", nextnumb());
      return (node(0, 0,
 		  node(numblabels-1, 0, (struct sem_rec *) NULL,
 		       (struct sem_rec *) NULL),
@@ -347,7 +347,7 @@ struct sem_rec *tom_index(struct sem_rec *x, struct sem_rec *i)
  */
 void labeldcl(char *id)
 {
-   printf("label L%d\n", ++numlabels);
+   printf("label L%d\n", nextnum());
 
    struct id_entry *temp;
    temp = dclr(id, T_INT, 4);
@@ -360,7 +360,7 @@ void labeldcl(char *id)
      {
        struct id_entry *t2;
        t2 = lookup(id, 0);
-       printf("B%d=L%d\n", ++numblabels, t2->i_width); //TODO: are the numbers being printed here correct?
+       printf("B%d=L%d\n", nextnumb(), t2->i_width); //TODO: are the numbers being printed here correct?
        //TODO: do I need to then backpatch after I find label in goto list?
      }
    }
@@ -372,7 +372,7 @@ void labeldcl(char *id)
  */
 int m()
 {
-   printf("label L%d\n", ++numlabels);
+   printf("label L%d\n", nextnum());
    return(numlabels-1);
 }
 
@@ -381,7 +381,7 @@ int m()
  */
 struct sem_rec *n()
 {
-   printf("br B%d\n", ++numblabels);
+   printf("br B%d\n", nextnumb());
    return node(numblabels, 0, 0, 0);
 }
 
@@ -437,8 +437,8 @@ struct sem_rec *rel(char *op, struct sem_rec *x, struct sem_rec *y)
    struct sem_rec *temp;
    recast_y(x, y);
    temp = gen(op, x, y, x->s_mode);
-   printf("bt t%d B%d\n", temp->s_place, ++numblabels);
-   printf("br B%d\n", ++numblabels);
+   printf("bt t%d B%d\n", temp->s_place, nextnumb());
+   printf("br B%d\n", nextnumb());
 
    temp->back.s_true = node(numblabels-1, temp->s_mode,0,0);
    temp->s_false = node(numblabels, temp->s_mode,0,0);
@@ -505,6 +505,35 @@ struct sem_rec *string(char *s)
 
 /************* Helper Functions **************/
 
+/*
+* nextnumb - returns next numblabel
+*/
+int nextnumb()
+{
+    if (numblabels == 0)
+        numblabels++;
+        return 0;
+    else
+        numblabels++;
+        return numlabels;
+}
+
+/*
+* nextnum - returns next numlabel
+*/
+int nextnum()
+{
+    if (numlabels == 0)
+        numlabels++;
+        return 0;
+    else
+        numlabels++;
+        return numlabels;
+}
+
+/*
+* recast_y - casts sem_rec y to appropriate type.
+*/
 struct sem_rec *recast_y(struct sem_rec *x, struct sem_rec *y)
 {
   struct sem_rec *casted_y;
