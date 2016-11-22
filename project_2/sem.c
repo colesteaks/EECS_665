@@ -25,7 +25,7 @@ void del_goto(int index);
  */
 void backpatch(struct sem_rec *p, int k)
 {
-   printf("B%d=L%d", p->s_place, k)
+   printf("B%d=L%d", p->s_place, k);
    p->s_place = k;
 }
 
@@ -50,7 +50,7 @@ struct sem_rec *call(char *f, struct sem_rec *args)
 
   while(arg)
   {
-    print("arg%c t%d", type_char(arg->s_mode), arg->s_place);
+    printf("arg%c t%d", type_char(arg->s_mode), arg->s_place);
     arg = arg->back.s_link;
     arg_count++;
   }
@@ -222,7 +222,7 @@ void doifelse(struct sem_rec *e, int m1, struct sem_rec *n,
                          int m2, int m3)
 {
    backpatch(e->back.s_true, m1);
-   backpatch(e->s_false, m2)
+   backpatch(e->s_false, m2);
    backpatch(n, m3);
 }
 
@@ -262,7 +262,7 @@ void endloopscope(int m)
  */
 struct sem_rec *exprs(struct sem_rec *l, struct sem_rec *e)
 {
-   return merge(l, r);
+   return merge(l, e);
 }
 
 /*
@@ -270,11 +270,12 @@ struct sem_rec *exprs(struct sem_rec *l, struct sem_rec *e)
  */
 void fhead(struct id_entry *p)
 {
-   for(int i = 0; i < formalnum; i++)
+   int i;
+   for(i = 0; i < formalnum; i++)
    {
       printf("formal %d", formaltypes[i]);
    }
-   for(int i = 0; i < localnum; i++)
+   for(i = 0; i < localnum; i++)
    {
       printf("localloc %d", localtypes[i]);
    }
@@ -351,13 +352,14 @@ void labeldcl(char *id)
    temp = dclr(id, T_INT, 4);
    temp->i_width = numlabels;
 
-   for (int i = 0; i < gotosize; i++)
+   int i;
+   for (i = 0; i < gotosize; i++)
    {
      if (id == gotolist[i])
      {
        struct id_entry *t2;
        t2 = lookup(id, 0);
-       printf("B%d=L%d", ++numblabels, t2->i_width) //TODO: are the numbers being printed here correct?
+       printf("B%d=L%d", ++numblabels, t2->i_width); //TODO: are the numbers being printed here correct?
        //TODO: do I need to then backpatch after I find label in goto list?
      }
    }
@@ -394,7 +396,7 @@ struct sem_rec *op1(char *op, struct sem_rec *y)
     y->s_mode &= ~T_ADDR;
     return (gen(op, (struct sem_rec *) NULL, y, y->s_mode));
   }
-  else if ((y->s_mode == T_DOUBLE) && (op == '~'))
+  else if ((y->s_mode == T_DOUBLE) && (*op == '~'))
   {
     y = cast(y, T_INT);
     return (gen(op, 0, y, T_INT));
@@ -532,7 +534,8 @@ void del_goto(int index)
 {
   if (index < gotosize-1)
   {
-      for (int i = index; i < gotosize-1; i++)
+      int i;
+      for (i = index; i < gotosize-1; i++)
       {
         gotolist[index] = gotolist[index+1];
       }
