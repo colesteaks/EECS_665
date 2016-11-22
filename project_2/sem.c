@@ -277,7 +277,7 @@ void fhead(struct id_entry *p)
    int i;
    for(i = 0; i < formalnum; i++)
    {
-     if (formaltypes[i] == i)
+     if (formaltypes[i] == 'i')
      {
        printf("formal 4\n");
      }
@@ -288,13 +288,13 @@ void fhead(struct id_entry *p)
    }
    for(i = 0; i < localnum; i++)
    {
-     if (localtypes[i] == i)
+     if (localtypes[i] == 'i')
      {
-       printf("local 4\n");
+       printf("localloc 4\n");
      }
      else
      {
-       printf("local 8\n");
+       printf("localloc 8\n");
      }
    }
 }

@@ -1,7 +1,7 @@
 alloc m 48
 func scale
-formal 0
-localloc 0
+formal 8
+localloc 4
 bgnstmt 6
 t1 := param 0
 t2 := @f t1
