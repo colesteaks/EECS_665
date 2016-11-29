@@ -590,6 +590,7 @@ void del_goto(int index)
   }
   //remove last item which is now duplicated.
   gotolist[gotosize-1] = NULL;
+  gotosize--;
 }
 
 /*
