@@ -4,12 +4,12 @@ CC=gcc
 
 LFLAGS=
 YFLAGS=
-CFLAGS=-Wall -Wno-unused-label -std=gnu99 -I. -g
+CFLAGS=-Wall -Wno-unused-label -std=gnu99 -I. -g -S
 
 all: cgen
 
 cgen: main.o function.o arg.o local.o temp.o strng.o cgen.yacc.o cgen.lex.o
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -m32
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
