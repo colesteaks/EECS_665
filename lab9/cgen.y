@@ -206,18 +206,24 @@ binop   : ID IEQ ID     { }
                           function_printtemp(function,$3);
                           printf( ", %%eax\n" );
 
-                          printf( "    shll       " );
+                          printf( "    movb       " );
                           function_printtemp(function,$1);
-                          printf( ", " );
+                          printf( ", %%cl\n" );
+
+                          printf( "    shll       " );
+                          printf( "%%cl, " );
                           printf( "%%eax\n" ); }
         //TODO: check
         | ID ISHR ID    { printf( "    movl       " );
                           function_printtemp(function,$3);
                           printf( ", %%eax\n" );
 
-                          printf( "    shrl       " );
+                          printf( "    movb       " );
                           function_printtemp(function,$1);
-                          printf( ", " );
+                          printf( ", %%cl\n" );
+
+                          printf( "    shrl       " );
+                          printf( "%%cl, " );
                           printf( "%%eax\n" ); }
         //given
         | ID IADD ID    { printf( "    movl       " );
@@ -243,7 +249,7 @@ binop   : ID IEQ ID     { }
                           function_printtemp(function,$3);
                           printf( ", %%eax\n" );
 
-                          printf( "    mull       " );
+                          printf( "    imull       " );
                           function_printtemp(function,$1);
                           printf( ", " );
                           printf( "%%eax\n" ); }
@@ -251,6 +257,8 @@ binop   : ID IEQ ID     { }
         | ID IDIV ID    { printf( "    movl       " );
                           function_printtemp(function,$3);
                           printf( ", %%eax\n" );
+
+                          printf("    movl        $0, %%edx\n");
 
                           printf( "    idivl       " );
                           function_printtemp(function,$1);
