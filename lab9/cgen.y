@@ -164,10 +164,14 @@ unop    : ISUB ID       { printf( "    movl       " );
                           printf( ", %%eax\n" ); }
         | IINV ID       { }
         | IDEREF ID     { }
-        | IARG ID       {  } //TODO
-        | ICALL ID INT  { /* printf( "calling " );
+        | IARG ID       { printf("    pushl       ");
+			  function_printtemp(function, $2);
+			  printf("\n"); }
+        | ICALL ID INT  { printf( "   call       " );
                           function_labeltemp(function,$2);
-                          printf( " with %lld arguments\n", $3); */ }
+                          printf("\n"); 
+			  while($3--) { printf("    popl %%eax\n"); } 
+			}
         | IRET ID       { printf( "    movl       " );
                           function_printtemp(function,$2);
                           printf( ", %%eax\n" ); }
@@ -264,7 +268,17 @@ binop   : ID IEQ ID     { }
                           function_printtemp(function,$1);
                           printf( "\n" ); }
         //TODO ??
-        | ID IMOD ID    {  }
+        | ID IMOD ID    { printf( "    movl       " );
+                          function_printtemp(function,$3);
+                          printf( ", %%eax\n" );
+
+                          printf("    movl        $0, %%edx\n");
+
+                          printf( "    idivl       " );
+                          function_printtemp(function,$1);
+                          printf( "\n" );
+
+			  printf("     movl       %%edx, %%eax\n");}
         | ID IIDX ID    { }
         | ID FEQ ID     { }
         | ID FNE ID     { }
